@@ -76,12 +76,14 @@ def slugify(text):
     return text[:60].strip("-")
 
 def make_svg(title, date_str, post_type):
+    max_len = 50
+    display_title = title if len(title) <= max_len else title[:max_len] + "..."
     svg = f'''<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
 <rect width="800" height="400" fill="#09090b"/>
 <rect x="0" y="376" width="800" height="24" fill="#18181b"/>
-<text x="48" y="180" fill="#fafafa" font-size="32" font-weight="700" font-family="system-ui, sans-serif">{escape(title)}</text>
-<text x="48" y="230" fill="#a1a1aa" font-size="15" font-family="system-ui, sans-serif">{escape(date_str)} · Dev & AI Digest</text>
-<text x="48" y="260" fill="#52525b" font-family="'SF Mono', 'JetBrains Mono', monospace" font-size="13" text-transform="uppercase" letter-spacing="2">{escape(post_type)}</text>
+<text x="48" y="180" fill="#fafafa" font-size="28" font-weight="700" font-family="system-ui, sans-serif">{escape(display_title)}</text>
+<text x="48" y="230" fill="#a1a1aa" font-size="14" font-family="system-ui, sans-serif">{escape(date_str)} · Dev & AI Digest</text>
+<text x="48" y="260" fill="#52525b" font-family="'SF Mono', 'JetBrains Mono', monospace" font-size="12" letter-spacing="2">{escape(post_type)}</text>
 </svg>'''
     return svg
 
@@ -302,21 +304,25 @@ GIT_TEMPLATES = {
 }
 
 def generate_digest_post(items):
-    lines = ["## 오늘의 기술 뉴스\n"]
+    now_str = NOW.strftime("%Y년 %m월 %d일")
+    lines = [f"오늘 {len(items)}건의 기술 소식을 선별했습니다.\n"]
     for i, it in enumerate(items, 1):
         title = it.get("title", "")
         source = it.get("source", "")
         url = it.get("url", "")
-        lines.append(f"### {i}. {title}")
-        lines.append(f"- 출처: {source}")
+        score = it.get("score", 0)
+        lines.append(f"## {i}. {title}")
+        lines.append("")
+        lines.append(f"**출처:** {source} | **점수:** {score}")
         if url:
-            lines.append(f"- 원문: {url}")
+            lines.append(f"**원문:** [{url}]({url})")
         lines.append("")
     body = "\n".join(lines)
-    title = f"Today's Tech Digest ({NOW.strftime('%m/%d')})"
+    title = f"오늘의 기술 뉴스 ({NOW.strftime('%m/%d')})"
     slug = f"tech-digest-{NOW.strftime('%m%d')}"
     date_str = NOW.strftime("%Y-%m-%d")
-    return build_post(title, slug, body, date_str, ["해외뉴스", "AI/개발"], "오늘의 기술 뉴스 모음")
+    excerpt = f"오늘의 주요 기술 뉴스 {len(items)}선: {items[0]['title']} 외"
+    return build_post(title, slug, body, date_str, ["해외뉴스", "AI/개발"], excerpt, source_name="HackerNews 외")
 
 def build_post(title, slug, body, date_str, tags, excerpt, source_name=None):
     POSTS_DIR.mkdir(exist_ok=True)
