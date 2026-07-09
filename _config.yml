@@ -1,0 +1,16 @@
+title: Dev & AI Digest
+description: AI와 개발 소식을 매일 한글로
+url: https://YOUR_USERNAME.github.io
+baseurl: /blog-auto
+markdown: kramdown
+permalink: /:year/:month/:day/:title/
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "default"
+      image: ""

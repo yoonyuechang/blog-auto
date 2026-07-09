@@ -1,0 +1,22 @@
+---
+layout: default
+title: null
+---
+
+<div class="posts">
+  {% for post in site.posts %}
+  <article class="post-card">
+    {% if post.image %}
+    <div class="post-image">
+      <img src="{{ post.image }}" alt="{{ post.title }}">
+    </div>
+    {% endif %}
+    <div class="post-content">
+      <h2><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h2>
+      <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
+      <p>{{ post.excerpt | strip_html | truncate: 200 }}</p>
+      <a href="{{ site.baseurl }}{{ post.url }}" class="read-more">계속 읽기</a>
+    </div>
+  </article>
+  {% endfor %}
+</div>
