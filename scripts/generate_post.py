@@ -319,6 +319,7 @@ def generate_digest_post(items):
     return build_post(title, slug, body, date_str, ["해외뉴스", "AI/개발"], "오늘의 기술 뉴스 모음")
 
 def build_post(title, slug, body, date_str, tags, excerpt, source_name=None):
+    POSTS_DIR.mkdir(exist_ok=True)
     image_dir = IMAGES_DIR
     image_dir.mkdir(exist_ok=True)
     image_path = image_dir / f"{date_str}-{slug}.svg"
