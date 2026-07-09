@@ -7,13 +7,11 @@
   <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
   <link rel="stylesheet" href="{{ site.baseurl }}/style.css">
   <link rel="alternate" type="application/rss+xml" title="{{ site.title }}" href="{{ site.baseurl }}/feed.xml">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>⌘</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><text y='18' font-size='18'>⌘</text></svg>">
   {% if site.adsense_id %}
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ site.adsense_id }}" crossorigin="anonymous"></script>
   {% endif %}
-  <script>
-    (function(){var s=localStorage.getItem('theme');if(s)document.documentElement.setAttribute('data-theme',s)})();
-  </script>
+  <script>(function(){var s=localStorage.getItem('t');if(s)document.documentElement.setAttribute('data-theme',s)})();</script>
 </head>
 <body>
   <header class="header">
@@ -26,16 +24,14 @@
         <a href="{{ site.baseurl }}/category/tech/" {% if page.url contains '/category/tech/' %}data-active{% endif %}>기술</a>
         <a href="{{ site.baseurl }}/feed.xml" class="nav-rss">RSS</a>
       </nav>
-      <button class="theme-toggle" onclick="var t=document.documentElement.getAttribute('data-theme');var n=t==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('theme',n)" aria-label="테마 전환">
-        <svg class="sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-        <svg class="moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <button class="theme-toggle" onclick="var t=document.documentElement.getAttribute('data-theme');var n=t==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('t',n)" aria-label="테마">
+        <svg class="sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
     </div>
   </header>
 
-  <main>
-    {{ content }}
-  </main>
+  <main>{{ content }}</main>
 
   <footer class="footer">
     <div class="footer-inner">
@@ -49,8 +45,8 @@
         <a href="https://github.com/yoonyuechang/blog-auto">GitHub</a>
       </div>
     </div>
-    <div class="footer-bottom">
-      <p>&copy; {{ "now" | date: "%Y" }} {{ site.title }}. <span class="sep">·</span> Built with Jekyll on GitHub Pages</p>
+    <div class="footer-sub">
+      &copy; {{ "now" | date: "%Y" }} {{ site.title }} &middot; Built with Jekyll on GitHub Pages
     </div>
   </footer>
 </body>

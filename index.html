@@ -3,55 +3,50 @@ layout: default
 ---
 
 <section class="hero">
-  <h1>개발과 AI,<br>매일 한 잔의 <span>다이제스트</span></h1>
+  <h1>개발과 AI, 매일 한 잔의 <span>다이제스트</span></h1>
   <p>HackerNews 인기글, Git 실전 스킬, 최신 기술 트렌드를 매일 정리합니다. 전문가도 초보자도 함께 읽는 기술 뉴스레터.</p>
-  <div class="hero-stats">
+  <div class="hero-meta">
     <span><strong>{{ site.posts.size }}</strong>개의 글</span>
-    <span><strong>매일</strong> 업데이트</span>
-    <span>무료 <strong>RSS</strong></span>
+    <span>매일 업데이트</span>
+    <span>무료 RSS</span>
   </div>
 </section>
 
-<div class="section-header">
-  <h2>오늘의 글</h2>
-  <nav class="category-tabs">
-    <a href="{{ site.baseurl }}/" class="active">전체</a>
-    <a href="{{ site.baseurl }}/category/news/">뉴스</a>
-    <a href="{{ site.baseurl }}/category/git/">Git</a>
-    <a href="{{ site.baseurl }}/category/tech/">기술</a>
-  </nav>
-</div>
+<nav class="section-tabs">
+  <a href="{{ site.baseurl }}/" data-active>전체</a>
+  <a href="{{ site.baseurl }}/category/news/">뉴스</a>
+  <a href="{{ site.baseurl }}/category/git/">Git</a>
+  <a href="{{ site.baseurl }}/category/tech/">기술</a>
+</nav>
 
 <div class="post-list">
   {% for post in site.posts %}
-  <a href="{{ site.baseurl }}{{ post.url }}" class="post-item">
+  <article class="post-item">
     <div class="post-meta">
       <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%m.%d" }}</time>
       {% assign tag = post.tags | first %}
       {% if tag %}
-      <span class="post-tag">{{ tag }}</span>
+      <span class="tag">{{ tag }}</span>
       {% endif %}
     </div>
     <div class="post-body">
-      <div class="post-title">{{ post.title }}</div>
+      <a href="{{ site.baseurl }}{{ post.url }}" class="post-title">{{ post.title }}</a>
       {% if post.excerpt %}
-      <div class="post-excerpt">{{ post.excerpt | strip_html | truncate: 120 }}</div>
+      <div class="post-excerpt">{{ post.excerpt | strip_html | truncate: 140 }}</div>
       {% endif %}
     </div>
-  </a>
+  </article>
   {% else %}
-  <div class="empty-state">
-    <div class="empty-icon">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-    </div>
+  <div class="empty">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
     <h3>첫 글이 생성 중입니다</h3>
-    <p>첫 글이 생성되면 여기에 표시됩니다. 잠시만 기다려주세요.</p>
+    <p>첫 글이 생성되면 여기에 표시됩니다.</p>
   </div>
   {% endfor %}
 </div>
 
 {% if site.adsense_id %}
-<div class="ad-unit">
+<div class="ad-box">
   <ins class="adsbygoogle" style="display:block" data-ad-client="{{ site.adsense_id }}" data-ad-slot="1234567890" data-ad-format="auto"></ins>
   <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 </div>

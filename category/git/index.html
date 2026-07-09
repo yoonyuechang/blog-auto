@@ -2,32 +2,39 @@
 layout: default
 ---
 
-<div class="category-heading">
+<div class="cat-head">
   <h1>Git</h1>
   <p>초보자부터 고수까지, Git 실전 스킬과 꿀팁을 소개합니다.</p>
 </div>
 
-<div class="post-list" style="padding-top:24px">
+<nav class="section-tabs" style="margin-top:24px">
+  <a href="{{ site.baseurl }}/">전체</a>
+  <a href="{{ site.baseurl }}/category/news/">뉴스</a>
+  <a href="{{ site.baseurl }}/category/git/" data-active>Git</a>
+  <a href="{{ site.baseurl }}/category/tech/">기술</a>
+</nav>
+
+<div class="post-list" style="padding-top:8px">
   {% for post in site.posts %}
     {% if post.tags contains "Git" or post.tags contains "개발팁" %}
-    <a href="{{ site.baseurl }}{{ post.url }}" class="post-item">
+    <article class="post-item">
       <div class="post-meta">
         <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%m.%d" }}</time>
         {% assign tag = post.tags | first %}
-        <span class="post-tag">{{ tag }}</span>
+        <span class="tag">{{ tag }}</span>
       </div>
       <div class="post-body">
-        <div class="post-title">{{ post.title }}</div>
+        <a href="{{ site.baseurl }}{{ post.url }}" class="post-title">{{ post.title }}</a>
         {% if post.excerpt %}
-        <div class="post-excerpt">{{ post.excerpt | strip_html | truncate: 120 }}</div>
+        <div class="post-excerpt">{{ post.excerpt | strip_html | truncate: 140 }}</div>
         {% endif %}
       </div>
-    </a>
+    </article>
     {% endif %}
   {% else %}
-  <div class="empty-state">
-    <h3>아직 글이 없습니다</h3>
-    <p>곧 Git 팁이 발행됩니다.</p>
+  <div class="empty">
+    <h3>아직 Git 팁이 없습니다</h3>
+    <p>곧 첫 팁이 발행됩니다.</p>
   </div>
   {% endfor %}
 </div>

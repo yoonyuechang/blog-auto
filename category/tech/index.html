@@ -2,32 +2,39 @@
 layout: default
 ---
 
-<div class="category-heading">
+<div class="cat-head">
   <h1>기술</h1>
   <p>개발 도구, 프레임워크, 아키텍처 등 기술 전반을 다룹니다.</p>
 </div>
 
-<div class="post-list" style="padding-top:24px">
+<nav class="section-tabs" style="margin-top:24px">
+  <a href="{{ site.baseurl }}/">전체</a>
+  <a href="{{ site.baseurl }}/category/news/">뉴스</a>
+  <a href="{{ site.baseurl }}/category/git/">Git</a>
+  <a href="{{ site.baseurl }}/category/tech/" data-active>기술</a>
+</nav>
+
+<div class="post-list" style="padding-top:8px">
   {% for post in site.posts %}
     {% if post.tags contains "기술" or post.tags contains "AI/개발" %}
-    <a href="{{ site.baseurl }}{{ post.url }}" class="post-item">
+    <article class="post-item">
       <div class="post-meta">
         <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%m.%d" }}</time>
         {% assign tag = post.tags | first %}
-        <span class="post-tag">{{ tag }}</span>
+        <span class="tag">{{ tag }}</span>
       </div>
       <div class="post-body">
-        <div class="post-title">{{ post.title }}</div>
+        <a href="{{ site.baseurl }}{{ post.url }}" class="post-title">{{ post.title }}</a>
         {% if post.excerpt %}
-        <div class="post-excerpt">{{ post.excerpt | strip_html | truncate: 120 }}</div>
+        <div class="post-excerpt">{{ post.excerpt | strip_html | truncate: 140 }}</div>
         {% endif %}
       </div>
-    </a>
+    </article>
     {% endif %}
   {% else %}
-  <div class="empty-state">
-    <h3>아직 글이 없습니다</h3>
-    <p>곧 기술 아티클이 발행됩니다.</p>
+  <div class="empty">
+    <h3>아직 기술 아티클이 없습니다</h3>
+    <p>곧 첫 아티클이 발행됩니다.</p>
   </div>
   {% endfor %}
 </div>

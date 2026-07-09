@@ -2,8 +2,8 @@
 layout: default
 ---
 
-<article class="post-full">
-  <header class="post-full-header">
+<article class="article">
+  <header class="article-header">
     <div class="tags">
       {% for tag in page.tags %}
       <span>{{ tag }}</span>
@@ -13,24 +13,24 @@ layout: default
     <div class="meta">
       <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y년 %m월 %d일" }}</time>
       {% if page.tags contains "Git" %}
-      <span>·</span>
+      <span>&middot;</span>
       <a href="https://git-scm.com/docs">git-scm.com</a>
       {% endif %}
     </div>
   </header>
 
   {% if page.image %}
-  <div class="post-hero-img">
+  <div class="article-image">
     <img src="{{ page.image }}" alt="{{ page.title }}">
   </div>
   {% endif %}
 
-  <div class="post-content">
+  <div class="article-content">
     {{ content }}
   </div>
 
   {% if site.adsense_id %}
-  <div class="ad-unit">
+  <div class="ad-box">
     <ins class="adsbygoogle" style="display:block" data-ad-client="{{ site.adsense_id }}" data-ad-slot="1234567890" data-ad-format="auto"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
   </div>
@@ -38,10 +38,16 @@ layout: default
 
   <nav class="post-nav">
     {% if page.previous %}
-    <a href="{{ site.baseurl }}{{ page.previous.url }}">← {{ page.previous.title }}</a>
+    <a href="{{ site.baseurl }}{{ page.previous.url }}">
+      <span class="nav-label">이전 글</span>
+      {{ page.previous.title }}
+    </a>
     {% endif %}
     {% if page.next %}
-    <a href="{{ site.baseurl }}{{ page.next.url }}">{{ page.next.title }} →</a>
+    <a href="{{ site.baseurl }}{{ page.next.url }}">
+      <span class="nav-label">다음 글</span>
+      {{ page.next.title }}
+    </a>
     {% endif %}
   </nav>
 </article>
