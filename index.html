@@ -3,11 +3,26 @@ layout: default
 ---
 
 <section class="hero">
-  <h1>AI와 개발 소식을 <span>매일 전합니다</span></h1>
-  <p>HackerNews 인기글, Git 실전 스킬, 최신 기술 트렌드를 선별해 요약합니다. 매일 아침, 5분이면 오늘의 기술 흐름을 읽을 수 있습니다.</p>
-  <div class="hero-meta">
-    <span>매일 업데이트</span>
-    <span>RSS 구독</span>
+  <div class="hero-content">
+    <h1>AI와 개발 소식을 <span>매일 전합니다</span></h1>
+    <p>HackerNews 인기글, Git 실전 스킬, 최신 기술 트렌드를 선별해 요약합니다. 매일 아침, 5분이면 오늘의 기술 흐름을 읽을 수 있습니다.</p>
+    <div class="hero-meta">
+      <span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        매일 업데이트
+      </span>
+      <span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+        <a href="{{ site.baseurl }}/feed.xml" style="border-bottom:1px solid var(--text3)">RSS 구독</a>
+      </span>
+      {% assign post_count = site.posts | size %}
+      {% if post_count > 0 %}
+      <span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        총 <strong>{{ post_count }}</strong>개의 글
+      </span>
+      {% endif %}
+    </div>
   </div>
 </section>
 
@@ -33,12 +48,19 @@ layout: default
       {% if post.excerpt %}
       <div class="post-excerpt">{{ post.excerpt | strip_html | truncate: 140 }}</div>
       {% endif %}
+      {% if post.source %}
+      <div class="post-source">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        {{ post.source }}
+      </div>
+      {% endif %}
     </div>
   </article>
   {% else %}
   <div class="empty">
     <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
     <h3>아직 발행된 글이 없습니다</h3>
+    <p>첫 글이 생성되는 대로 여기에 표시됩니다</p>
   </div>
   {% endfor %}
 </div>

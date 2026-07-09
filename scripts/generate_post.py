@@ -83,20 +83,74 @@ def save_progress(p):
     with open(PROGRESS_FILE, "w") as f:
         json.dump(p, f)
 
-def fetch_hn():
+def fetch_hn(limit=30):
     try:
         resp = requests.get("https://hacker-news.firebaseio.com/v0/topstories.json", timeout=15)
         resp.raise_for_status()
-        ids = resp.json()[:5]
+        ids = resp.json()[:limit]
         items = []
         for i in ids:
             r = requests.get(f"https://hacker-news.firebaseio.com/v0/item/{i}.json", timeout=10)
             r.raise_for_status()
-            items.append(r.json())
+            d = r.json()
+            items.append({"title": d.get("title",""), "url": d.get("url",""), "score": d.get("score",0), "descendants": d.get("descendants",0), "source": "HackerNews", "id": i})
         return items
     except Exception as e:
         print(f"HN fetch failed: {e}")
         return []
+
+def fetch_reddit(subreddits=None):
+    if subreddits is None:
+        subreddits = ["programming", "MachineLearning", "artificial", "tech"]
+    items = []
+    for sub in subreddits:
+        try:
+            resp = requests.get(f"https://www.reddit.com/r/{sub}/hot.json?limit=10", timeout=15, headers={"User-Agent": "Mozilla/5.0"})
+            resp.raise_for_status()
+            for post in resp.json()["data"]["children"]:
+                d = post["data"]
+                if d.get("stickied") or d.get("over_18"):
+                    continue
+                items.append({"title": d["title"], "url": d.get("url",""), "score": d.get("score",0), "descendants": d.get("num_comments",0), "source": f"r/{sub}", "id": d.get("id","")})
+        except Exception as e:
+            print(f"Reddit {sub} failed: {e}")
+    return items
+
+def fetch_lobsters(limit=20):
+    try:
+        resp = requests.get("https://lobste.rs/api/v1/hottest.json?limit=" + str(limit), timeout=15)
+        resp.raise_for_status()
+        items = []
+        for d in resp.json():
+            items.append({"title": d.get("title",""), "url": d.get("url",""), "score": d.get("score",0), "descendants": d.get("comment_count",0), "source": "Lobsters", "id": d.get("short_id","")})
+        return items
+    except Exception as e:
+        print(f"Lobsters fetch failed: {e}")
+        return []
+
+def fetch_devto(limit=10):
+    try:
+        resp = requests.get(f"https://dev.to/api/articles?top=1&per_page={limit}", timeout=15)
+        resp.raise_for_status()
+        items = []
+        for d in resp.json():
+            items.append({"title": d.get("title",""), "url": d.get("url",""), "score": d.get("positive_reactions_count",0), "descendants": d.get("comments_count",0), "source": "dev.to", "id": d.get("id","")})
+        return items
+    except Exception as e:
+        print(f"dev.to fetch failed: {e}")
+        return []
+
+def collect_news():
+    items = []
+    items.extend(fetch_hn(30))
+    items.extend(fetch_reddit())
+    items.extend(fetch_lobsters(20))
+    items.extend(fetch_devto(10))
+
+    for it in items:
+        it["engagement"] = it["score"] + it["descendants"] * 2
+    items.sort(key=lambda x: x["engagement"], reverse=True)
+    return items[:20]
 
 NEWS_PROMPT = textwrap.dedent("""\
 당신은 실리콘밸리에서 일하는 한국인 개발자 출신 테크 라이터입니다.
@@ -120,37 +174,55 @@ NEWS_PROMPT = textwrap.dedent("""\
 - 총 분량: 1000-1500자 내외""")
 
 def generate_news_post(progress):
-    items = fetch_hn()
-    if not items:
-        print("No HN items, falling back to git post")
+    all_items = collect_news()
+    if not all_items:
+        print("No news items from any source, falling back to git post")
         return generate_git_post(progress)
 
-    item = random.choice(items)
-    title = item.get("title", "")
-    url = item.get("url", f"https://news.ycombinator.com/item?id={item['id']}")
-    hn_url = f"https://news.ycombinator.com/item?id={item['id']}"
-    score = item.get("score", 0)
+    top = all_items[:10]
+    candidates = "\n\n".join([
+        f"[{i+1}] {it['title']}\n   출처: {it['source']}   점수: {it['score']}   댓글: {it['descendants']}   URL: {it['url']}"
+        for i, it in enumerate(top)
+    ])
 
     prompt = textwrap.dedent(f"""\
-    다음 HackerNews에서 뜨고 있는 글을 소개하는 블로그 포스트를 써주세요.
+    오늘의 기술 뉴스 후보 10개입니다. 이 중 가장 블로그 포스트로 가치 있는 것을 골라 포스트를 작성해주세요.
 
-    제목: {title}
-    원문: {url}
-    토론: {hn_url}
-    추천: {score}점
+    선정 기준:
+    - 한국 개발자에게 실질적으로 유용한 정보인가
+    - 기술적 깊이가 있는가
+    - 단순한 제품 발표보다 업계 흐름을 보여주는가
+    - 지나치게 영어권/서양 중심에 갇히지 않았는가
 
-    포인트:
-    - 초보자는 "아 이런 게 있구나", 전문가는 "요즘 이게 뜨는구나" 느끼게
-    - 원문이 다루는 핵심 개념을 한국 개발자 맥락에서 풀어서 설명
-    - 비슷한 국내 기술/서비스가 있다면 비교해서 언급
-    - 원문 링크는 본문에 '원문 보기' 형태로 포함""")
+    --- 후보 목록 ---
 
-    post_text = gemini(prompt, system=NEWS_PROMPT)
-    post_title = title[:80]
-    post_slug = slugify(title)
+    {candidates}
+
+    ---
+
+    출력 형식:
+    1. 먼저 '---선정---' 줄에 선택한 후보 번호를 씁니다
+    2. 이어서 블로그 포스트를 작성합니다""")
+
+    result = gemini(prompt, system=NEWS_PROMPT)
+
+    selected = 0
+    post_text = result
+    for i in range(1, 11):
+        if f"---선정---\n{i}" in result or f"---선정---\n\n{i}" in result:
+            selected = i - 1
+            parts = result.split("---선정---")
+            if len(parts) > 1:
+                post_text = parts[-1].strip()
+            break
+
+    item = top[selected] if selected < len(top) else top[0]
+    post_title = item["title"][:80]
+    source_url = item["url"] or f"https://news.ycombinator.com/item?id={item['id']}"
+    post_slug = slugify(post_title)
     date_str = NOW.strftime("%Y-%m-%d")
 
-    return build_post(post_title, post_slug, post_text, date_str, ["해외뉴스", "AI/개발"], f"HackerNews 인기: {title[:60]}")
+    return build_post(post_title, post_slug, post_text, date_str, ["해외뉴스", "AI/개발"], f"{item['source']}: {post_title[:60]}", source_url, source_name=item['source'])
 
 GIT_PROMPT = textwrap.dedent("""\
 당신은 Git을 잘 이해하고 있는 한국인 시니어 개발자입니다.
@@ -195,9 +267,9 @@ def generate_git_post(progress):
     post_slug = slugify(topic)
     date_str = NOW.strftime("%Y-%m-%d")
 
-    return build_post(post_title, post_slug, post_text, date_str, ["Git", "개발팁"], f"{topic} 사용법과 활용 팁")
+    return build_post(post_title, post_slug, post_text, date_str, ["Git", "개발팁"], f"{topic} 사용법과 활용 팁", source_name="Git")
 
-def build_post(title, slug, body, date_str, tags, excerpt):
+def build_post(title, slug, body, date_str, tags, excerpt, source_name=None):
     image_dir = IMAGES_DIR
     image_dir.mkdir(exist_ok=True)
     image_path = image_dir / f"{date_str}-{slug}.svg"
@@ -211,13 +283,18 @@ def build_post(title, slug, body, date_str, tags, excerpt):
     if body.startswith('"') and body.endswith('"'):
         body = body[1:-1]
 
+    content_words = len(body.split())
+    reading_time = max(1, round(content_words / 350))
+
     front = f"""---
-layout: default
+layout: post
+reading_time: {reading_time}
 title: "{title}"
 date: {NOW.strftime("%Y-%m-%d %H:%M:%S")} +0900
 tags: [{', '.join(tags)}]
 image: "{image_url}"
 excerpt: "{excerpt[:160]}"
+source: "{source_name or 'Dev & AI Digest'}"
 ---
 """
     post_path = POSTS_DIR / f"{date_str}-{slug}.md"
