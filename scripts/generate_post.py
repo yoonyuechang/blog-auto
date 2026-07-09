@@ -64,17 +64,11 @@ def slugify(text):
 
 def make_svg(title, date_str, post_type):
     svg = f'''<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
-<stop offset="0%" style="stop-color:#667eea"/>
-<stop offset="100%" style="stop-color:#764ba2"/>
-</linearGradient>
-</defs>
-<rect width="800" height="400" fill="url(#g)"/>
-<rect x="0" y="0" width="800" height="400" fill="rgba(0,0,0,0.15)"/>
-<text x="400" y="180" text-anchor="middle" fill="white" font-size="36" font-weight="bold" font-family="sans-serif">{escape(title)}</text>
-<text x="400" y="240" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="16" font-family="sans-serif">{escape(date_str)} · Dev & AI Digest</text>
-<text x="400" y="280" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="14" font-family="sans-serif">{escape(post_type)}</text>
+<rect width="800" height="400" fill="#09090b"/>
+<rect x="0" y="376" width="800" height="24" fill="#18181b"/>
+<text x="48" y="180" fill="#fafafa" font-size="32" font-weight="700" font-family="system-ui, sans-serif">{escape(title)}</text>
+<text x="48" y="230" fill="#a1a1aa" font-size="15" font-family="system-ui, sans-serif">{escape(date_str)} · Dev & AI Digest</text>
+<text x="48" y="260" fill="#52525b" font-family="'SF Mono', 'JetBrains Mono', monospace" font-size="13" text-transform="uppercase" letter-spacing="2">{escape(post_type)}</text>
 </svg>'''
     return svg
 
