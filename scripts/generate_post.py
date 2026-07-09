@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, sys, json, random, textwrap, re, base64
+import os, sys, json, random, textwrap, re, base64, time
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -15,6 +15,8 @@ NOW = datetime.now(KST)
 POSTS_DIR = Path(__file__).parent.parent / "_posts"
 IMAGES_DIR = Path(__file__).parent.parent / "images"
 PROGRESS_FILE = Path(__file__).parent / ".progress"
+
+UA = "DevAndAIDigest/1.0 (GitHub Actions; +https://github.com/yoonyuechang/blog-auto)"
 
 GIT_TOPICS = [
     ("git bisect", "이분탐색으로 버그를 찾는 과학적인 방법"),
@@ -50,12 +52,22 @@ def gemini(prompt, system=None):
     body = {"contents": [{"parts": parts}]}
     if system:
         body["systemInstruction"] = {"parts": [{"text": system}]}
-    resp = requests.post(
-        f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_KEY}",
-        json=body, timeout=120,
-    )
-    resp.raise_for_status()
-    return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+    for attempt in range(3):
+        try:
+            resp = requests.post(
+                f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_KEY}",
+                json=body, timeout=120,
+            )
+            resp.raise_for_status()
+            return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+        except requests.HTTPError as e:
+            if resp.status_code == 429 and attempt < 2:
+                wait = 2 ** (attempt + 1)
+                print(f"Gemini 429, retrying in {wait}s...")
+                time.sleep(wait)
+                continue
+            raise
+    raise Exception("Gemini API failed after 3 retries")
 
 def slugify(text):
     text = text.lower().replace(" ", "-")
@@ -85,12 +97,12 @@ def save_progress(p):
 
 def fetch_hn(limit=30):
     try:
-        resp = requests.get("https://hacker-news.firebaseio.com/v0/topstories.json", timeout=15)
+        resp = requests.get("https://hacker-news.firebaseio.com/v0/topstories.json", timeout=15, headers={"User-Agent": UA})
         resp.raise_for_status()
         ids = resp.json()[:limit]
         items = []
         for i in ids:
-            r = requests.get(f"https://hacker-news.firebaseio.com/v0/item/{i}.json", timeout=10)
+            r = requests.get(f"https://hacker-news.firebaseio.com/v0/item/{i}.json", timeout=10, headers={"User-Agent": UA})
             r.raise_for_status()
             d = r.json()
             items.append({"title": d.get("title",""), "url": d.get("url",""), "score": d.get("score",0), "descendants": d.get("descendants",0), "source": "HackerNews", "id": i})
@@ -105,7 +117,11 @@ def fetch_reddit(subreddits=None):
     items = []
     for sub in subreddits:
         try:
-            resp = requests.get(f"https://www.reddit.com/r/{sub}/hot.json?limit=10", timeout=15, headers={"User-Agent": "Mozilla/5.0"})
+            resp = requests.get(
+                f"https://www.reddit.com/r/{sub}/hot.json?limit=10",
+                timeout=15,
+                headers={"User-Agent": UA},
+            )
             resp.raise_for_status()
             for post in resp.json()["data"]["children"]:
                 d = post["data"]
@@ -114,14 +130,15 @@ def fetch_reddit(subreddits=None):
                 items.append({"title": d["title"], "url": d.get("url",""), "score": d.get("score",0), "descendants": d.get("num_comments",0), "source": f"r/{sub}", "id": d.get("id","")})
         except Exception as e:
             print(f"Reddit {sub} failed: {e}")
+        time.sleep(0.5)
     return items
 
-def fetch_lobsters(limit=20):
+def fetch_lobsters():
     try:
-        resp = requests.get("https://lobste.rs/api/v1/hottest.json?limit=" + str(limit), timeout=15)
+        resp = requests.get("https://lobste.rs/hottest.json", timeout=15, headers={"User-Agent": UA})
         resp.raise_for_status()
         items = []
-        for d in resp.json():
+        for d in resp.json()[:20]:
             items.append({"title": d.get("title",""), "url": d.get("url",""), "score": d.get("score",0), "descendants": d.get("comment_count",0), "source": "Lobsters", "id": d.get("short_id","")})
         return items
     except Exception as e:
@@ -130,7 +147,7 @@ def fetch_lobsters(limit=20):
 
 def fetch_devto(limit=10):
     try:
-        resp = requests.get(f"https://dev.to/api/articles?top=1&per_page={limit}", timeout=15)
+        resp = requests.get(f"https://dev.to/api/articles?top=1&per_page={limit}", timeout=15, headers={"User-Agent": UA})
         resp.raise_for_status()
         items = []
         for d in resp.json():
@@ -144,7 +161,7 @@ def collect_news():
     items = []
     items.extend(fetch_hn(30))
     items.extend(fetch_reddit())
-    items.extend(fetch_lobsters(20))
+    items.extend(fetch_lobsters())
     items.extend(fetch_devto(10))
 
     for it in items:
