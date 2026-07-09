@@ -66,8 +66,9 @@ def gemini(prompt, system=None):
                 print(f"Gemini 429, retrying in {waits[attempt]}s...")
                 time.sleep(waits[attempt])
                 continue
-            raise
-    raise Exception("Gemini API failed after 4 retries")
+            print(f"Gemini failed: {e}")
+            return None
+    return None
 
 def slugify(text):
     text = text.lower().replace(" ", "-")
@@ -225,23 +226,27 @@ def generate_news_post(progress):
 
     result = gemini(prompt, system=NEWS_PROMPT)
 
-    selected = 0
-    post_text = result
-    for i in range(1, 11):
-        if f"---선정---\n{i}" in result or f"---선정---\n\n{i}" in result:
-            selected = i - 1
-            parts = result.split("---선정---")
-            if len(parts) > 1:
-                post_text = parts[-1].strip()
-            break
+    if result:
+        selected = 0
+        post_text = result
+        for i in range(1, 11):
+            if f"---선정---\n{i}" in result or f"---선정---\n\n{i}" in result:
+                selected = i - 1
+                parts = result.split("---선정---")
+                if len(parts) > 1:
+                    post_text = parts[-1].strip()
+                break
 
-    item = top[selected] if selected < len(top) else top[0]
-    post_title = item["title"][:80]
-    source_url = item["url"] or f"https://news.ycombinator.com/item?id={item['id']}"
-    post_slug = slugify(post_title)
-    date_str = NOW.strftime("%Y-%m-%d")
+        item = top[selected] if selected < len(top) else top[0]
+        post_title = item["title"][:80]
+        source_url = item["url"] or f"https://news.ycombinator.com/item?id={item['id']}"
+        post_slug = slugify(post_title)
+        date_str = NOW.strftime("%Y-%m-%d")
 
-    return build_post(post_title, post_slug, post_text, date_str, ["해외뉴스", "AI/개발"], f"{item['source']}: {post_title[:60]}", source_url, source_name=item['source'])
+        return build_post(post_title, post_slug, post_text, date_str, ["해외뉴스", "AI/개발"], f"{item['source']}: {post_title[:60]}", source_url, source_name=item['source'])
+    else:
+        print("Gemini unavailable, generating digest post")
+        return generate_digest_post(top[:5])
 
 GIT_PROMPT = textwrap.dedent("""\
 당신은 Git을 잘 이해하고 있는 한국인 시니어 개발자입니다.
@@ -286,7 +291,32 @@ def generate_git_post(progress):
     post_slug = slugify(topic)
     date_str = NOW.strftime("%Y-%m-%d")
 
+    if not post_text:
+        print("Gemini unavailable, using template")
+        post_text = GIT_TEMPLATES.get(topic, f"'{topic}'에 대해 알아봅니다. 이 명령어는 {desc} 상황에서 유용합니다.\n\n자세한 내용은 `man git` 또는 공식 문서를 참조하세요.")
+
     return build_post(post_title, post_slug, post_text, date_str, ["Git", "개발팁"], f"{topic} 사용법과 활용 팁", source_name="Git")
+
+GIT_TEMPLATES = {
+    t[0]: f"## {t[0]}\n\n{t[1]}.\n\n### 기본 사용법\n```bash\n# 터미널에서 실행\n```\n\n### 주의할 점\n- 상황에 따라 적절히 사용해야 합니다.\n- 공식 문서를 먼저 확인하는 것을 권장합니다.\n" for t in GIT_TOPICS
+}
+
+def generate_digest_post(items):
+    lines = ["## 오늘의 기술 뉴스\n"]
+    for i, it in enumerate(items, 1):
+        title = it.get("title", "")
+        source = it.get("source", "")
+        url = it.get("url", "")
+        lines.append(f"### {i}. {title}")
+        lines.append(f"- 출처: {source}")
+        if url:
+            lines.append(f"- 원문: {url}")
+        lines.append("")
+    body = "\n".join(lines)
+    title = f"Today's Tech Digest ({NOW.strftime('%m/%d')})"
+    slug = f"tech-digest-{NOW.strftime('%m%d')}"
+    date_str = NOW.strftime("%Y-%m-%d")
+    return build_post(title, slug, body, date_str, ["해외뉴스", "AI/개발"], "오늘의 기술 뉴스 모음")
 
 def build_post(title, slug, body, date_str, tags, excerpt, source_name=None):
     image_dir = IMAGES_DIR
@@ -329,14 +359,10 @@ def main():
 
     is_git_day = day % 3 == 2
 
-    try:
-        if is_git_day:
-            generate_git_post(progress)
-        else:
-            generate_news_post(progress)
-    except Exception as e:
-        print(f"News generation failed ({e}), falling back to git post")
+    if is_git_day:
         generate_git_post(progress)
+    else:
+        generate_news_post(progress)
 
     progress["day"] = day + 1
     save_progress(progress)
