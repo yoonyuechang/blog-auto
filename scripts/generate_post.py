@@ -52,7 +52,8 @@ def gemini(prompt, system=None):
     body = {"contents": [{"parts": parts}]}
     if system:
         body["systemInstruction"] = {"parts": [{"text": system}]}
-    for attempt in range(3):
+    waits = [10, 30, 60]
+    for attempt in range(4):
         try:
             resp = requests.post(
                 f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_KEY}",
@@ -61,13 +62,12 @@ def gemini(prompt, system=None):
             resp.raise_for_status()
             return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
         except requests.HTTPError as e:
-            if resp.status_code == 429 and attempt < 2:
-                wait = 2 ** (attempt + 1)
-                print(f"Gemini 429, retrying in {wait}s...")
-                time.sleep(wait)
+            if resp.status_code == 429 and attempt < 3:
+                print(f"Gemini 429, retrying in {waits[attempt]}s...")
+                time.sleep(waits[attempt])
                 continue
             raise
-    raise Exception("Gemini API failed after 3 retries")
+    raise Exception("Gemini API failed after 4 retries")
 
 def slugify(text):
     text = text.lower().replace(" ", "-")
@@ -116,21 +116,23 @@ def fetch_reddit(subreddits=None):
         subreddits = ["programming", "MachineLearning", "artificial", "tech"]
     items = []
     for sub in subreddits:
-        try:
-            resp = requests.get(
-                f"https://www.reddit.com/r/{sub}/hot.json?limit=10",
-                timeout=15,
-                headers={"User-Agent": UA},
-            )
-            resp.raise_for_status()
-            for post in resp.json()["data"]["children"]:
-                d = post["data"]
-                if d.get("stickied") or d.get("over_18"):
-                    continue
-                items.append({"title": d["title"], "url": d.get("url",""), "score": d.get("score",0), "descendants": d.get("num_comments",0), "source": f"r/{sub}", "id": d.get("id","")})
-        except Exception as e:
-            print(f"Reddit {sub} failed: {e}")
-        time.sleep(0.5)
+        for domain in ["old.reddit.com", "www.reddit.com"]:
+            try:
+                resp = requests.get(
+                    f"https://{domain}/r/{sub}/hot.json?limit=10",
+                    timeout=15,
+                    headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"},
+                )
+                resp.raise_for_status()
+                for post in resp.json()["data"]["children"]:
+                    d = post["data"]
+                    if d.get("stickied") or d.get("over_18"):
+                        continue
+                    items.append({"title": d["title"], "url": d.get("url",""), "score": d.get("score",0), "descendants": d.get("num_comments",0), "source": f"r/{sub}", "id": d.get("id","")})
+                break
+            except Exception:
+                continue
+        time.sleep(1)
     return items
 
 def fetch_lobsters():
@@ -159,7 +161,7 @@ def fetch_devto(limit=10):
 
 def collect_news():
     items = []
-    items.extend(fetch_hn(30))
+    items.extend(fetch_hn(50))
     items.extend(fetch_reddit())
     items.extend(fetch_lobsters())
     items.extend(fetch_devto(10))
@@ -327,10 +329,14 @@ def main():
 
     is_git_day = day % 3 == 2
 
-    if is_git_day:
+    try:
+        if is_git_day:
+            generate_git_post(progress)
+        else:
+            generate_news_post(progress)
+    except Exception as e:
+        print(f"News generation failed ({e}), falling back to git post")
         generate_git_post(progress)
-    else:
-        generate_news_post(progress)
 
     progress["day"] = day + 1
     save_progress(progress)
