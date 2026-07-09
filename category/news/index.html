@@ -1,0 +1,33 @@
+---
+layout: default
+---
+
+<div class="category-heading">
+  <h1>뉴스</h1>
+  <p>HackerNews, TechCrunch 등 해외 기술 뉴스를 한국어로 정리합니다.</p>
+</div>
+
+<div class="post-list" style="padding-top:24px">
+  {% for post in site.posts %}
+    {% if post.tags contains "뉴스" or post.tags contains "해외뉴스" or post.tags contains "AI" %}
+    <a href="{{ site.baseurl }}{{ post.url }}" class="post-item">
+      <div class="post-meta">
+        <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%m.%d" }}</time>
+        {% assign tag = post.tags | first %}
+        <span class="post-tag">{{ tag }}</span>
+      </div>
+      <div class="post-body">
+        <div class="post-title">{{ post.title }}</div>
+        {% if post.excerpt %}
+        <div class="post-excerpt">{{ post.excerpt | strip_html | truncate: 120 }}</div>
+        {% endif %}
+      </div>
+    </a>
+    {% endif %}
+  {% else %}
+  <div class="empty-state">
+    <h3>아직 글이 없습니다</h3>
+    <p>곧 뉴스가 발행됩니다.</p>
+  </div>
+  {% endfor %}
+</div>

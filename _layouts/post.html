@@ -3,29 +3,38 @@ layout: default
 ---
 
 <article class="post-full">
-  <div class="tag-list">
-    {% for tag in page.tags %}
-    <span>{{ tag }}</span>
-    {% endfor %}
-  </div>
-
-  <h1>{{ page.title }}</h1>
-
-  <div class="meta">
-    <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y년 %m월 %d일" }}</time>
-    {% if page.tags contains "Git" or page.tags contains "개발팁" %}
-    <span>·</span>
-    <a href="https://git-scm.com/docs">git-scm.com</a>
-    {% endif %}
-  </div>
+  <header class="post-full-header">
+    <div class="tags">
+      {% for tag in page.tags %}
+      <span>{{ tag }}</span>
+      {% endfor %}
+    </div>
+    <h1>{{ page.title }}</h1>
+    <div class="meta">
+      <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y년 %m월 %d일" }}</time>
+      {% if page.tags contains "Git" %}
+      <span>·</span>
+      <a href="https://git-scm.com/docs">git-scm.com</a>
+      {% endif %}
+    </div>
+  </header>
 
   {% if page.image %}
-  <div class="post-image">
+  <div class="post-hero-img">
     <img src="{{ page.image }}" alt="{{ page.title }}">
   </div>
   {% endif %}
 
-  {{ content }}
+  <div class="post-content">
+    {{ content }}
+  </div>
+
+  {% if site.adsense_id %}
+  <div class="ad-unit">
+    <ins class="adsbygoogle" style="display:block" data-ad-client="{{ site.adsense_id }}" data-ad-slot="1234567890" data-ad-format="auto"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+  {% endif %}
 
   <nav class="post-nav">
     {% if page.previous %}
