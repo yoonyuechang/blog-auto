@@ -1,0 +1,38 @@
+---
+layout: default
+---
+
+<article class="post-full">
+  <div class="tag-list">
+    {% for tag in page.tags %}
+    <span>{{ tag }}</span>
+    {% endfor %}
+  </div>
+
+  <h1>{{ page.title }}</h1>
+
+  <div class="meta">
+    <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y년 %m월 %d일" }}</time>
+    {% if page.tags contains "Git" or page.tags contains "개발팁" %}
+    <span>·</span>
+    <a href="https://git-scm.com/docs">git-scm.com</a>
+    {% endif %}
+  </div>
+
+  {% if page.image %}
+  <div class="post-image">
+    <img src="{{ page.image }}" alt="{{ page.title }}">
+  </div>
+  {% endif %}
+
+  {{ content }}
+
+  <nav class="post-nav">
+    {% if page.previous %}
+    <a href="{{ site.baseurl }}{{ page.previous.url }}">← {{ page.previous.title }}</a>
+    {% endif %}
+    {% if page.next %}
+    <a href="{{ site.baseurl }}{{ page.next.url }}">{{ page.next.title }} →</a>
+    {% endif %}
+  </nav>
+</article>

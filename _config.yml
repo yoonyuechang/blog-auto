@@ -1,9 +1,10 @@
 title: Dev & AI Digest
-description: AI와 개발 소식을 매일 한글로
-url: https://YOUR_USERNAME.github.io
+description: AI와 개발, 오픈소스 소식을 매일 정리합니다
+url: https://yoonyuechang.github.io
 baseurl: /blog-auto
 markdown: kramdown
 permalink: /:year/:month/:day/:title/
+show_excerpts: false
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
@@ -12,5 +13,5 @@ defaults:
       path: ""
       type: "posts"
     values:
-      layout: "default"
+      layout: "post"
       image: ""
