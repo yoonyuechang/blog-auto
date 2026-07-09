@@ -5,9 +5,11 @@ from pathlib import Path
 from xml.sax.saxutils import escape
 import requests
 
+GROQ_KEY = os.environ.get("GROQ_API_KEY")
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
-if not GEMINI_KEY:
-    print("GEMINI_API_KEY not set")
+
+if not GROQ_KEY and not GEMINI_KEY:
+    print("GROQ_API_KEY or GEMINI_API_KEY required")
     sys.exit(1)
 
 KST = timezone(timedelta(hours=9))
@@ -47,7 +49,37 @@ GIT_TOPICS = [
 
 SITE_BASE = os.environ.get("SITE_BASE", "/blog-auto")
 
+def groq_chat(prompt, system=None):
+    if not GROQ_KEY:
+        return None
+    messages = []
+    if system:
+        messages.append({"role": "system", "content": system})
+    messages.append({"role": "user", "content": prompt})
+    body = {
+        "model": "llama3-70b-8192",
+        "messages": messages,
+        "temperature": 0.7,
+        "max_tokens": 2048,
+    }
+    for attempt in range(3):
+        try:
+            resp = requests.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                json=body,
+                headers={"Authorization": f"Bearer {GROQ_KEY}", "Content-Type": "application/json"},
+                timeout=120,
+            )
+            resp.raise_for_status()
+            return resp.json()["choices"][0]["message"]["content"]
+        except Exception as e:
+            print(f"Groq attempt {attempt+1}/3 failed: {e}")
+            time.sleep(5)
+    return None
+
 def gemini(prompt, system=None):
+    if not GEMINI_KEY:
+        return None
     parts = [{"text": prompt}]
     body = {"contents": [{"parts": parts}]}
     if system:
@@ -70,20 +102,47 @@ def gemini(prompt, system=None):
             return None
     return None
 
+def call_llm(prompt, system=None):
+    result = groq_chat(prompt, system)
+    if result:
+        return result
+    print("Groq unavailable, trying Gemini...")
+    return gemini(prompt, system)
+
 def slugify(text):
     text = text.lower().replace(" ", "-")
     text = re.sub(r"[^a-z0-9가-힣\-\_]", "", text)
     return text[:60].strip("-")
 
 def make_svg(title, date_str, post_type):
-    max_len = 50
+    max_len = 60
     display_title = title if len(title) <= max_len else title[:max_len] + "..."
     svg = f'''<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
-<rect width="800" height="400" fill="#09090b"/>
+<defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0%" stop-color="#09090b"/>
+<stop offset="50%" stop-color="#111113"/>
+<stop offset="100%" stop-color="#0a0a0d"/>
+</linearGradient>
+<linearGradient id="glow" x1="0" y1="0" x2="0.4" y2="0.6">
+<stop offset="0%" stop-color="#3b82f6" stop-opacity="0.15"/>
+<stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+<stop offset="0%" stop-color="#3b82f6"/>
+<stop offset="100%" stop-color="#8b5cf6"/>
+</linearGradient>
+</defs>
+<rect width="800" height="400" fill="url(#bg)"/>
+<rect width="800" height="400" fill="url(#glow)"/>
 <rect x="0" y="376" width="800" height="24" fill="#18181b"/>
-<text x="48" y="180" fill="#fafafa" font-size="28" font-weight="700" font-family="system-ui, sans-serif">{escape(display_title)}</text>
-<text x="48" y="230" fill="#a1a1aa" font-size="14" font-family="system-ui, sans-serif">{escape(date_str)} · Dev & AI Digest</text>
-<text x="48" y="260" fill="#52525b" font-family="'SF Mono', 'JetBrains Mono', monospace" font-size="12" letter-spacing="2">{escape(post_type)}</text>
+<rect x="48" y="374" width="704" height="1" fill="#27272a"/>
+<rect x="48" y="130" width="40" height="4" rx="2" fill="url(#accent)"/>
+<text x="48" y="175" fill="#fafafa" font-size="26" font-weight="700" font-family="system-ui, sans-serif">{escape(display_title)}</text>
+<text x="48" y="225" fill="#a1a1aa" font-size="14" font-family="system-ui, sans-serif">{escape(date_str)}</text>
+<rect x="48" y="248" width="100" height="24" rx="4" fill="#1e293b"/>
+<text x="67" y="264" fill="#60a5fa" font-family="'SF Mono', 'JetBrains Mono', monospace" font-size="11" letter-spacing="1.5" text-anchor="middle">{escape(post_type)}</text>
+<text x="48" y="390" fill="#52525b" font-family="'SF Mono', 'JetBrains Mono', monospace" font-size="11" letter-spacing="1">Dev & AI Digest</text>
 </svg>'''
     return svg
 
@@ -226,7 +285,7 @@ def generate_news_post(progress):
     1. 먼저 '---선정---' 줄에 선택한 후보 번호를 씁니다
     2. 이어서 블로그 포스트를 작성합니다""")
 
-    result = gemini(prompt, system=NEWS_PROMPT)
+    result = call_llm(prompt, system=NEWS_PROMPT)
 
     if result:
         selected = 0
@@ -241,13 +300,12 @@ def generate_news_post(progress):
 
         item = top[selected] if selected < len(top) else top[0]
         post_title = item["title"][:80]
-        source_url = item["url"] or f"https://news.ycombinator.com/item?id={item['id']}"
         post_slug = slugify(post_title)
         date_str = NOW.strftime("%Y-%m-%d")
 
-        return build_post(post_title, post_slug, post_text, date_str, ["해외뉴스", "AI/개발"], f"{item['source']}: {post_title[:60]}", source_url, source_name=item['source'])
+        return build_post(post_title, post_slug, post_text, date_str, ["해외뉴스", "AI/개발"], f"{item['source']}: {post_title[:60]}", source_name=item['source'])
     else:
-        print("Gemini unavailable, generating digest post")
+        print("LLM unavailable, generating digest post")
         return generate_digest_post(top[:5])
 
 GIT_PROMPT = textwrap.dedent("""\
@@ -288,13 +346,13 @@ def generate_git_post(progress):
     - 중급자는 실무에 바로 써먹을 수 있고
     - 고수는 "아 맞아, 그런데 이건 조심해야 하지" 하는 함정까지 포함""")
 
-    post_text = gemini(prompt, system=GIT_PROMPT)
+    post_text = call_llm(prompt, system=GIT_PROMPT)
     post_title = f"{topic}: {desc}"
     post_slug = slugify(topic)
     date_str = NOW.strftime("%Y-%m-%d")
 
     if not post_text:
-        print("Gemini unavailable, using template")
+        print("LLM unavailable, using template")
         post_text = GIT_TEMPLATES.get(topic, f"'{topic}'에 대해 알아봅니다. 이 명령어는 {desc} 상황에서 유용합니다.\n\n자세한 내용은 `man git` 또는 공식 문서를 참조하세요.")
 
     return build_post(post_title, post_slug, post_text, date_str, ["Git", "개발팁"], f"{topic} 사용법과 활용 팁", source_name="Git")
@@ -305,17 +363,22 @@ GIT_TEMPLATES = {
 
 def generate_digest_post(items):
     now_str = NOW.strftime("%Y년 %m월 %d일")
-    lines = [f"오늘 {len(items)}건의 기술 소식을 선별했습니다.\n"]
+    lines = [f"{now_str} 기준, 주요 기술 커뮤니티에서 가장 주목받은 {len(items)}건의 소식을 정리했습니다.\n"]
     for i, it in enumerate(items, 1):
         title = it.get("title", "")
         source = it.get("source", "")
         url = it.get("url", "")
         score = it.get("score", 0)
+        comments = it.get("descendants", 0)
         lines.append(f"## {i}. {title}")
         lines.append("")
-        lines.append(f"**출처:** {source} | **점수:** {score}")
+        lines.append(f"| 항목 | 내용 |")
+        lines.append(f"|------|------|")
+        lines.append(f"| 출처 | {source} |")
+        lines.append(f"| 추천 | {score} |")
+        lines.append(f"| 댓글 | {comments} |")
         if url:
-            lines.append(f"**원문:** [{url}]({url})")
+            lines.append(f"| 원문 | [링크]({url}) |")
         lines.append("")
     body = "\n".join(lines)
     title = f"오늘의 기술 뉴스 ({NOW.strftime('%m/%d')})"
