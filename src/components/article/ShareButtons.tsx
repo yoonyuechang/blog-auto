@@ -26,6 +26,7 @@ export default function ShareButtons({ title, url }: ShareButtonsProps) {
         href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
         target="_blank"
         rel="noopener noreferrer"
+        aria-label="X에 공유하기"
         className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-border hover:text-text-primary"
       >
         <Twitter size={16} />
@@ -35,6 +36,7 @@ export default function ShareButtons({ title, url }: ShareButtonsProps) {
         href={`https://story.kakao.com/share?url=${encodedUrl}&text=${encodedTitle}`}
         target="_blank"
         rel="noopener noreferrer"
+        aria-label="KakaoTalk에 공유하기"
         className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-border hover:text-text-primary"
       >
         <MessageCircle size={16} />
@@ -42,6 +44,7 @@ export default function ShareButtons({ title, url }: ShareButtonsProps) {
       </a>
       <button
         onClick={handleCopy}
+        aria-label={copied ? "링크 복사됨" : "링크 복사"}
         className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-border hover:text-text-primary"
       >
         {copied ? <Check size={16} className="text-emerald-400" /> : <Link2 size={16} />}

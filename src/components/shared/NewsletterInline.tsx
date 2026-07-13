@@ -32,7 +32,9 @@ export default function NewsletterInline() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="mx-auto flex max-w-md gap-2">
+            <label htmlFor="newsletter-email" className="sr-only">이메일 주소</label>
             <input
+              id="newsletter-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}

@@ -14,7 +14,7 @@ export default function WeeklyDigest({ articles }: { articles: Article[] }) {
   if (articles.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-8">
+    <section className="mx-auto max-w-6xl px-4 py-8" aria-label="이번 주 인기글">
       <div className="mb-4 flex items-center gap-2">
         <TrendingUp size={18} className="text-emerald-400" />
         <h2 className="text-lg font-bold text-text-primary">이번 주 인기글 TOP 5</h2>

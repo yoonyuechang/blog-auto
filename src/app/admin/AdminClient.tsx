@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { LayoutDashboard, ListChecks, Rss, Users } from "lucide-react";
 import KPICards from "@/components/admin/KPICards";
 import ApprovalQueue from "@/components/admin/ApprovalQueue";
 import SourceManager from "@/components/admin/SourceManager";
@@ -12,6 +13,12 @@ interface AdminData {
   sources: { id: number; name: string; type: string; url: string; fetchInterval: string; isActive: boolean; category: string }[];
   subscribers: { id: number; email: string; subscribedAt: string; isActive: boolean }[];
 }
+
+const tabs = [
+  { key: "queue" as const, label: "승인 큐", icon: ListChecks },
+  { key: "sources" as const, label: "소스 관리", icon: Rss },
+  { key: "subscribers" as const, label: "구독자", icon: Users },
+];
 
 export default function AdminClient({ data }: { data: AdminData }) {
   const [tab, setTab] = useState<"queue" | "sources" | "subscribers">("queue");
@@ -38,19 +45,25 @@ export default function AdminClient({ data }: { data: AdminData }) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
-      <h1 className="mb-8 text-2xl font-extrabold text-text-primary">관리자 대시보드</h1>
+      <div className="mb-8 flex items-center gap-3">
+        <LayoutDashboard size={24} className="text-emerald-400" />
+        <h1 className="text-2xl font-extrabold text-text-primary">관리자 대시보드</h1>
+      </div>
       <KPICards data={data.kpi} />
-      <div className="mb-6 flex gap-2 border-b border-border">
-        {([["queue", "승인 큐"], ["sources", "소스 관리"], ["subscribers", "구독자"]] as const).map(([key, label]) => (
+      <div className="mb-6 flex gap-1 rounded-lg border border-border bg-card p-1">
+        {tabs.map(({ key, label, icon: Icon }) => (
           <button key={key} onClick={() => setTab(key)}
-            className={`border-b-2 px-4 py-2 text-sm transition-colors ${tab === key ? "border-emerald-400 text-text-primary" : "border-transparent text-text-muted hover:text-text-secondary"}`}>
+            className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors ${tab === key ? "bg-emerald-500 text-white" : "text-text-muted hover:text-text-primary"}`}>
+            <Icon size={16} />
             {label}
           </button>
         ))}
       </div>
-      {tab === "queue" && <ApprovalQueue articles={data.pendingArticles} onApprove={handleApprove} onReject={handleReject} />}
-      {tab === "sources" && <SourceManager sources={data.sources} onToggle={handleToggleSource} onAdd={handleAddSource} />}
-      {tab === "subscribers" && <SubscriberList subscribers={data.subscribers} />}
+      <div className="rounded-xl border border-border bg-card p-6">
+        {tab === "queue" && <ApprovalQueue articles={data.pendingArticles} onApprove={handleApprove} onReject={handleReject} />}
+        {tab === "sources" && <SourceManager sources={data.sources} onToggle={handleToggleSource} onAdd={handleAddSource} />}
+        {tab === "subscribers" && <SubscriberList subscribers={data.subscribers} />}
+      </div>
     </div>
   );
 }

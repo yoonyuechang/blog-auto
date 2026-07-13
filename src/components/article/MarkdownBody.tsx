@@ -57,6 +57,7 @@ const components: Components = {
             const pre = e.currentTarget.closest("div")?.querySelector("pre");
             if (pre) navigator.clipboard.writeText(pre.textContent ?? "");
           }}
+          aria-label="코드 복사"
           className="rounded border border-border bg-card px-2 py-1 text-xs text-text-muted opacity-0 transition-opacity hover:bg-border hover:text-text-primary group-hover/code:opacity-100"
         >
           복사
@@ -124,7 +125,7 @@ const components: Components = {
 
 export default function MarkdownBody({ content }: MarkdownBodyProps) {
   return (
-    <div className="prose prose-invert max-w-none">
+    <div className="max-w-none">
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
         {content}
       </ReactMarkdown>

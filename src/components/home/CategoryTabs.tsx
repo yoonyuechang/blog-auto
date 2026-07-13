@@ -8,11 +8,12 @@ interface CategoryTabsProps {
 
 export default function CategoryTabs({ categories, activeCategory, onSelect }: CategoryTabsProps) {
   return (
-    <div className="mx-auto flex max-w-6xl gap-0 overflow-x-auto border-b border-border px-4 scrollbar-hide">
+    <nav aria-label="카테고리 필터" className="mx-auto flex max-w-6xl gap-0 overflow-x-auto border-b border-border px-4 scrollbar-hide">
       {["전체", ...categories].map((cat) => (
         <button
           key={cat}
           onClick={() => onSelect(cat)}
+          aria-pressed={activeCategory === cat}
           className={`relative whitespace-nowrap px-5 py-3 text-sm transition-colors ${
             activeCategory === cat
               ? "font-medium text-text-primary"
@@ -25,6 +26,6 @@ export default function CategoryTabs({ categories, activeCategory, onSelect }: C
           )}
         </button>
       ))}
-    </div>
+    </nav>
   );
 }

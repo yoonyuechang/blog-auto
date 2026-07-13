@@ -61,6 +61,8 @@ export default function Header() {
           <div ref={dropdownRef} className="relative">
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
+              aria-expanded={dropdownOpen}
+              aria-haspopup="true"
               className="flex items-center gap-1 rounded-md px-3 py-1.5 text-sm text-text-muted transition-colors hover:bg-card hover:text-text-primary"
             >
               카테고리
@@ -94,6 +96,7 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }))}
+            aria-label="검색 열기 (Ctrl+K)"
             className="hidden items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-1.5 text-sm text-text-muted transition-colors hover:border-border hover:text-text-secondary md:flex"
           >
             <Search size={14} />
@@ -154,6 +157,7 @@ export default function Header() {
                     setMobileOpen(false);
                     window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }));
                   }}
+                  aria-label="검색 열기 (Ctrl+K)"
                   className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-sm text-text-secondary hover:bg-card hover:text-text-primary"
                 >
                   <Search size={16} />

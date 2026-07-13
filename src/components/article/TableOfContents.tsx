@@ -68,6 +68,7 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
     <div className="mb-8 rounded-lg border border-border bg-card p-4">
       <button
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
         className="flex w-full items-center justify-between text-sm font-semibold text-text-primary"
       >
         <span className="flex items-center gap-2">

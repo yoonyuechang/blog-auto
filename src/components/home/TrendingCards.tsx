@@ -29,7 +29,7 @@ export default function TrendingCards({ articles }: TrendingCardsProps) {
   if (articles.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-8">
+    <section className="mx-auto max-w-6xl px-4 py-8" aria-label="트렌딩 글">
       <h2 className="mb-4 text-lg font-bold text-text-primary">🔥 트렌딩</h2>
       <div className="grid gap-4 md:grid-cols-3">
         {articles.map((article, i) => (

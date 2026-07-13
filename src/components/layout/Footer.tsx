@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="border-t border-border bg-[#080C14]">
@@ -15,26 +17,26 @@ export default function Footer() {
           </div>
 
           {/* Categories */}
-          <div>
+          <nav aria-label="카테고리">
             <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-text-secondary">카테고리</h4>
             <ul className="space-y-2 text-xs text-text-muted">
-              <li><a href="/category/ai" className="transition-colors hover:text-emerald-400">인공지능</a></li>
-              <li><a href="/category/web" className="transition-colors hover:text-emerald-400">웹개발</a></li>
-              <li><a href="/category/opensource" className="transition-colors hover:text-emerald-400">오픈소스</a></li>
-              <li><a href="/category/research" className="transition-colors hover:text-emerald-400">논문/리서치</a></li>
-              <li><a href="/category/career" className="transition-colors hover:text-emerald-400">커리어</a></li>
+              <li><Link href="/category/ai" className="transition-colors hover:text-emerald-400">인공지능</Link></li>
+              <li><Link href="/category/web" className="transition-colors hover:text-emerald-400">웹개발</Link></li>
+              <li><Link href="/category/opensource" className="transition-colors hover:text-emerald-400">오픈소스</Link></li>
+              <li><Link href="/category/research" className="transition-colors hover:text-emerald-400">논문/리서치</Link></li>
+              <li><Link href="/category/career" className="transition-colors hover:text-emerald-400">커리어</Link></li>
             </ul>
-          </div>
+          </nav>
 
           {/* Quick Links */}
-          <div>
+          <nav aria-label="바로가기">
             <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-text-secondary">바로가기</h4>
             <ul className="space-y-2 text-xs text-text-muted">
-              <li><a href="/" className="transition-colors hover:text-emerald-400">홈</a></li>
-              <li><a href="/subscribe" className="transition-colors hover:text-emerald-400">구독</a></li>
-              <li><a href="/admin" className="transition-colors hover:text-emerald-400">관리자</a></li>
+              <li><Link href="/" className="transition-colors hover:text-emerald-400">홈</Link></li>
+              <li><Link href="/subscribe" className="transition-colors hover:text-emerald-400">구독</Link></li>
+              <li><Link href="/admin" className="transition-colors hover:text-emerald-400">관리자</Link></li>
             </ul>
-          </div>
+          </nav>
         </div>
       </div>
     </footer>

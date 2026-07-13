@@ -95,8 +95,10 @@ export default function HeroSection({
       </div>
 
       {/* Subscribe form */}
-      <form onSubmit={handleSubscribe} className="mx-auto mt-10 flex max-w-md gap-2">
+      <form onSubmit={handleSubscribe} aria-label="뉴스레터 구독" className="mx-auto mt-10 flex max-w-md gap-2">
+        <label htmlFor="hero-email" className="sr-only">이메일 주소</label>
         <input
+          id="hero-email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
