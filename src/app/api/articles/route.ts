@@ -5,8 +5,8 @@ import { Prisma } from "@prisma/client";
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "12");
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") || "12")));
     const category = searchParams.get("category");
     const status = searchParams.get("status");
     const difficulty = searchParams.get("difficulty");
@@ -35,17 +35,29 @@ export async function GET(req: NextRequest) {
     ]);
 
     return NextResponse.json({ articles, total, page, limit });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to fetch articles" }, { status: 500 });
   }
 }
 
+const ARTICLE_FIELDS = [
+  "title", "summary", "content", "source", "sourceUrl",
+  "category", "tags", "difficultyLevel", "publishedAt", "status",
+] as const;
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const article = await db.article.create({ data: body });
+    const data: Record<string, unknown> = {};
+    for (const key of ARTICLE_FIELDS) {
+      if (key in body) data[key] = body[key];
+    }
+    if (!data.title || !data.source || !data.sourceUrl) {
+      return NextResponse.json({ error: "title, source, sourceUrl required" }, { status: 400 });
+    }
+    const article = await db.article.create({ data: data as any });
     return NextResponse.json(article, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to create article" }, { status: 500 });
   }
 }

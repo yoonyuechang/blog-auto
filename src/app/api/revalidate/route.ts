@@ -3,7 +3,9 @@ import { revalidatePath } from "next/cache";
 
 export async function POST(req: NextRequest) {
   const secret = req.headers.get("x-revalidate-secret");
-  if (secret !== process.env.REVALIDATE_SECRET) {
+  const expected = process.env.REVALIDATE_SECRET;
+
+  if (!expected || secret !== expected) {
     return NextResponse.json({ error: "Invalid secret" }, { status: 401 });
   }
 
