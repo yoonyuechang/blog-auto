@@ -23,7 +23,7 @@ async function callNvidia(prompt: string, system?: string): Promise<string | nul
 async function callGemini(prompt: string, system?: string): Promise<string | null> {
   if (!GEMINI_KEY) return null;
   try {
-    const body: any = { contents: [{ parts: [{ text: prompt }] }] };
+    const body: { contents: { parts: { text: string }[] }[]; systemInstruction?: { parts: { text: string }[] } } = { contents: [{ parts: [{ text: prompt }] }] };
     if (system) body.systemInstruction = { parts: [{ text: system }] };
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
       method: "POST",

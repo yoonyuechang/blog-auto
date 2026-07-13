@@ -8,9 +8,9 @@ import SubscriberList from "@/components/admin/SubscriberList";
 
 interface AdminData {
   kpi: { totalArticles: number; pendingArticles: number; totalSubscribers: number; totalViews: number };
-  pendingArticles: any[];
-  sources: any[];
-  subscribers: any[];
+  pendingArticles: { id: number; title: string; source: string; difficultyLevel: string; aiSummary: string; createdAt: string }[];
+  sources: { id: number; name: string; type: string; url: string; fetchInterval: string; isActive: boolean; category: string }[];
+  subscribers: { id: number; email: string; subscribedAt: string; isActive: boolean }[];
 }
 
 export default function AdminClient({ data }: { data: AdminData }) {
@@ -31,7 +31,7 @@ export default function AdminClient({ data }: { data: AdminData }) {
     window.location.reload();
   };
 
-  const handleAddSource = async (source: any) => {
+  const handleAddSource = async (source: { name: string; url: string; type: string; fetchInterval: string; isActive: boolean; category: string }) => {
     await fetch("/api/sources", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(source) });
     window.location.reload();
   };

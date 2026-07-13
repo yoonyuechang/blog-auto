@@ -8,6 +8,8 @@ import RelatedArticles from "@/components/article/RelatedArticles";
 import ReadingProgress from "@/components/article/ReadingProgress";
 import ArticleFeedback from "@/components/feedback/ArticleFeedback";
 import TableOfContents from "@/components/article/TableOfContents";
+import ShareButtons from "@/components/article/ShareButtons";
+import NewsletterInline from "@/components/shared/NewsletterInline";
 import AdSense from "@/components/shared/AdSense";
 import {
   generateBreadcrumbSchema,
@@ -116,9 +118,25 @@ export default async function ArticlePage({ params }: PageProps) {
       <AISummary aiSummary={article.aiSummary} keyPoints={article.keyPoints} />
       <MarkdownBody content={article.content} />
       <AdSense slot="0000000000" format="auto" />
-      <div className="mt-8">
-        <ArticleFeedback articleId={article.id} />
+
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
+        <ShareButtons
+          title={article.title}
+          url={`${SITE_URL}/article/${id}`}
+        />
       </div>
+
+      <div className="mt-6 rounded-xl border border-border bg-card p-6">
+        <h3 className="mb-3 text-center text-base font-bold text-text-primary">
+          이 글이 도움이 되었나요?
+        </h3>
+        <div className="flex justify-center">
+          <ArticleFeedback articleId={article.id} />
+        </div>
+      </div>
+
+      <NewsletterInline />
+
       <RelatedArticles
         articles={related.map((r) => ({
           id: r.id,

@@ -1,22 +1,5 @@
 const SITE_URL = "https://blog-auto-woad.vercel.app";
 
-export function generateArticleSchema(article: any) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: article.title,
-    description: article.aiSummary,
-    author: { "@type": "Organization", name: "DevPulse" },
-    datePublished: article.publishedAt?.toISOString?.() || article.publishedAt,
-    dateModified: article.updatedAt?.toISOString?.() || article.updatedAt,
-    publisher: { "@type": "Organization", name: "DevPulse" },
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": `${SITE_URL}/article/${article.id}`,
-    },
-  };
-}
-
 export function generateBreadcrumbSchema(
   article: { id: number; title: string; category: string },
   categorySlug?: string

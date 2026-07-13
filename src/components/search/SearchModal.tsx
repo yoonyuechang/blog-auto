@@ -5,7 +5,7 @@ import { Search, X } from "lucide-react";
 export default function SearchModal() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<{ id: number; title: string; category: string }[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ export default function SearchModal() {
   useEffect(() => {
     if (!query.trim()) { setResults([]); return; }
     const timer = setTimeout(async () => {
-      const res = await fetch(`/api/articles?q=${encodeURIComponent(query)}&limit=5&status=`);
+      const res = await fetch(`/api/articles?q=${encodeURIComponent(query)}&limit=5&status=approved`);
       const data = await res.json();
       setResults(data.articles || []);
     }, 300);
@@ -42,7 +42,7 @@ export default function SearchModal() {
         </div>
         {results.length > 0 && (
           <div className="mt-4 space-y-2">
-            {results.map((r: any) => (
+            {results.map((r) => (
               <a key={r.id} href={`/article/${r.id}`} onClick={() => setOpen(false)}
                 className="block rounded-lg p-3 hover:bg-border">
                 <p className="text-sm font-medium text-text-primary">{r.title}</p>

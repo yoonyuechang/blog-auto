@@ -47,6 +47,23 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
 
   if (!headings.length) return null;
 
+  const headingList = headings.map((h) => (
+    <li key={h.id}>
+      <button
+        onClick={() => scrollTo(h.id)}
+        className={`block w-full truncate rounded px-2 py-1 text-left text-sm transition-colors ${
+          h.level === 3 ? "pl-5" : ""
+        } ${
+          activeId === h.id
+            ? "bg-emerald-950 text-emerald-400"
+            : "text-text-secondary hover:text-text-primary"
+        }`}
+      >
+        {h.text}
+      </button>
+    </li>
+  ));
+
   return (
     <div className="mb-8 rounded-lg border border-border bg-card p-4">
       <button
@@ -60,44 +77,12 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
         {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
       </button>
 
-      {/* mobile: collapsible */}
       <ul className={`mt-3 space-y-1 md:hidden ${isOpen ? "block" : "hidden"}`}>
-        {headings.map((h) => (
-          <li key={h.id}>
-            <button
-              onClick={() => scrollTo(h.id)}
-              className={`block w-full truncate rounded px-2 py-1 text-left text-sm transition-colors ${
-                h.level === 3 ? "pl-5" : ""
-              } ${
-                activeId === h.id
-                  ? "bg-emerald-950 text-emerald-400"
-                  : "text-text-secondary hover:text-text-primary"
-              }`}
-            >
-              {h.text}
-            </button>
-          </li>
-        ))}
+        {headingList}
       </ul>
 
-      {/* desktop: always visible, sticky */}
       <ul className="mt-3 hidden space-y-1 md:block">
-        {headings.map((h) => (
-          <li key={h.id}>
-            <button
-              onClick={() => scrollTo(h.id)}
-              className={`block w-full truncate rounded px-2 py-1 text-left text-sm transition-colors ${
-                h.level === 3 ? "pl-5" : ""
-              } ${
-                activeId === h.id
-                  ? "bg-emerald-950 text-emerald-400"
-                  : "text-text-secondary hover:text-text-primary"
-              }`}
-            >
-              {h.text}
-            </button>
-          </li>
-        ))}
+        {headingList}
       </ul>
     </div>
   );

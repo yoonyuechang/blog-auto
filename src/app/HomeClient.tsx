@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import CategoryTabs from "@/components/home/CategoryTabs";
 import TrendingCards from "@/components/home/TrendingCards";
+import WeeklyDigest from "@/components/home/WeeklyDigest";
 import ArticleGrid from "@/components/home/ArticleGrid";
 import AdSense from "@/components/shared/AdSense";
 
@@ -18,14 +19,23 @@ interface Article {
   viewCount: number;
 }
 
+interface WeeklyArticle {
+  id: number;
+  title: string;
+  category: string;
+  difficultyLevel: string;
+  viewCount: number;
+}
+
 interface HomeClientProps {
   initialTrending: Article[];
+  weeklyTop: WeeklyArticle[];
   categories: string[];
 }
 
 const PAGE_SIZE = 12;
 
-export default function HomeClient({ initialTrending, categories }: HomeClientProps) {
+export default function HomeClient({ initialTrending, weeklyTop, categories }: HomeClientProps) {
   const [activeCategory, setActiveCategory] = useState("전체");
   const [articles, setArticles] = useState<Article[]>([]);
   const [page, setPage] = useState(1);
@@ -41,20 +51,25 @@ export default function HomeClient({ initialTrending, categories }: HomeClientPr
 
   const fetchArticles = async (pageNum: number, replace = false) => {
     setLoading(true);
-    const params = new URLSearchParams({
-      page: String(pageNum),
-      limit: String(PAGE_SIZE),
-      status: "approved",
-    });
-    if (activeCategory !== "전체") params.set("category", activeCategory);
+    try {
+      const params = new URLSearchParams({
+        page: String(pageNum),
+        limit: String(PAGE_SIZE),
+        status: "approved",
+      });
+      if (activeCategory !== "전체") params.set("category", activeCategory);
 
-    const res = await fetch(`/api/articles?${params}`);
-    const data = await res.json();
+      const res = await fetch(`/api/articles?${params}`);
+      const data = await res.json();
 
-    if (replace) setArticles(data.articles);
-    else setArticles((prev) => [...prev, ...data.articles]);
-    setHasMore(data.articles.length === PAGE_SIZE);
-    setLoading(false);
+      if (replace) setArticles(data.articles);
+      else setArticles((prev) => [...prev, ...data.articles]);
+      setHasMore(data.articles.length === PAGE_SIZE);
+    } catch {
+      // network or parse error — leave articles as-is
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleLoadMore = () => {
@@ -67,6 +82,7 @@ export default function HomeClient({ initialTrending, categories }: HomeClientPr
     <>
       <CategoryTabs categories={categories} activeCategory={activeCategory} onSelect={setActiveCategory} />
       <TrendingCards articles={initialTrending} />
+      <WeeklyDigest articles={weeklyTop} />
       <AdSense slot="0000000000" format="horizontal" />
       <ArticleGrid articles={articles} loading={loading} onLoadMore={handleLoadMore} hasMore={hasMore} />
     </>

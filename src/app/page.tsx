@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import HeroSection from "@/components/home/HeroSection";
 import HomeClient from "./HomeClient";
+import NewsletterInline from "@/components/shared/NewsletterInline";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,19 @@ export default async function HomePage() {
     take: 3,
   });
 
+  const weeklyTop = await db.article.findMany({
+    where: { status: "approved" },
+    orderBy: { viewCount: "desc" },
+    take: 5,
+    select: {
+      id: true,
+      title: true,
+      category: true,
+      difficultyLevel: true,
+      viewCount: true,
+    },
+  });
+
   const categories = await db.category.findMany();
 
   return (
@@ -33,8 +47,10 @@ export default async function HomePage() {
           tags: a.tags,
           publishedAt: a.publishedAt.toISOString().split("T")[0],
         }))}
+        weeklyTop={weeklyTop}
         categories={categories.map((c) => c.name)}
       />
+      <NewsletterInline />
     </>
   );
 }

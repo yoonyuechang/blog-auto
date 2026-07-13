@@ -31,7 +31,7 @@ export async function fetchDevto(): Promise<FetchResult[]> {
   try {
     const res = await fetch("https://dev.to/api/articles?top=7&per_page=20");
     const articles = await res.json();
-    return articles.map((a: any) => ({
+    return articles.map((a: { title?: string; url?: string; description?: string; published_at?: string }) => ({
       title: a.title || "",
       url: a.url || "",
       summary: a.description || "",
@@ -46,7 +46,7 @@ export async function fetchGitHubTrending(): Promise<FetchResult[]> {
     const date = new Date(Date.now() - 7 * 86400000).toISOString().split("T")[0];
     const res = await fetch(`https://api.github.com/search/repositories?q=pushed:>${date}&sort=stars&order=desc&per_page=20`);
     const data = await res.json();
-    return (data.items || []).map((r: any) => ({
+    return (data.items || []).map((r: { full_name?: string; description?: string; html_url?: string; pushed_at?: string }) => ({
       title: `${r.full_name}: ${r.description || ""}`.slice(0, 100),
       url: r.html_url || "",
       summary: r.description || "",

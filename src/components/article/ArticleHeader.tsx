@@ -20,11 +20,6 @@ const CATEGORY_COLORS: Record<string, string> = {
   개발문화: "bg-cyan-950 text-cyan-400",
 };
 
-function estimateReadingTime(content: string): number {
-  const charsPerMin = 1200;
-  return Math.max(1, Math.ceil(content.length / charsPerMin));
-}
-
 export default function ArticleHeader({
   title,
   category,
