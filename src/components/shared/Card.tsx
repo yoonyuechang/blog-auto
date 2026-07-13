@@ -9,7 +9,7 @@ interface CardProps {
 
 export default function Card({ children, href, className = "", accentColor = "#34D399" }: CardProps) {
   const baseStyles =
-    "group relative rounded-xl border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-500 hover:shadow-[0_4px_24px_rgba(0,0,0,0.3),0_0_12px_rgba(52,211,153,0.08)] overflow-hidden";
+    "group relative rounded-xl border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-1 hover:border-[#475569] hover:shadow-[0_4px_24px_rgba(0,0,0,0.3),0_0_12px_rgba(52,211,153,0.08)] overflow-hidden";
 
   const accent = (
     <span

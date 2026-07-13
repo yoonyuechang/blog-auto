@@ -7,6 +7,7 @@ import WeeklyDigest from "@/components/home/WeeklyDigest";
 import ArticleGrid from "@/components/home/ArticleGrid";
 import FeaturedArticle from "@/components/home/FeaturedArticle";
 import AdSense from "@/components/shared/AdSense";
+import CategoryShowcase from "@/components/home/CategoryShowcase";
 
 interface Article {
   id: number;
@@ -83,6 +84,7 @@ export default function HomeClient({ initialTrending, featuredArticle, weeklyTop
   return (
     <>
       {featuredArticle && <FeaturedArticle {...featuredArticle} />}
+      <CategoryShowcase />
       <CategoryTabs categories={categories} activeCategory={activeCategory} onSelect={setActiveCategory} />
       <TrendingCards articles={initialTrending} />
       <WeeklyDigest articles={weeklyTop} />

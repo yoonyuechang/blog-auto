@@ -115,10 +115,9 @@ export default function Header() {
       </div>
 
       {/* Mobile slide-in menu */}
-      {mobileOpen && (
-        <div className="fixed inset-0 top-14 z-50 md:hidden">
+      <div className={`fixed inset-0 top-14 z-50 md:hidden transition-opacity duration-200 ${mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}>
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <nav className="relative ml-auto h-full w-72 border-l border-border bg-bg/95 backdrop-blur-xl">
+          <nav className={`relative ml-auto h-full w-72 border-l border-border bg-bg/95 backdrop-blur-xl transition-transform duration-200 ease-out ${mobileOpen ? "translate-x-0" : "translate-x-full"}`}>
             <div className="flex flex-col p-4">
               <Link
                 href="/"
@@ -167,8 +166,7 @@ export default function Header() {
               </div>
             </div>
           </nav>
-        </div>
-      )}
+      </div>
     </header>
   );
 }

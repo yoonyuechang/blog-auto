@@ -67,15 +67,15 @@ export default function HeroSection({
       {/* Stats */}
       <div className="mx-auto mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-text-muted md:gap-10">
         <div className="flex items-center gap-2">
-          <Newspaper size={16} className="text-emerald-400" />
+          <Newspaper size={18} className="text-emerald-400" />
           <span>총 <strong className="text-text-primary">{totalArticles.toLocaleString()}</strong>개 글</span>
         </div>
         <div className="flex items-center gap-2">
-          <FolderOpen size={16} className="text-cyan-400" />
+          <FolderOpen size={18} className="text-cyan-400" />
           <span><strong className="text-text-primary">6</strong>개 카테고리</span>
         </div>
         <div className="flex items-center gap-2">
-          <RefreshCw size={16} className="text-emerald-400" />
+          <RefreshCw size={18} className="text-emerald-400" />
           <span><strong className="text-emerald-400">{todayArticles}</strong>개 오늘 수집</span>
         </div>
       </div>

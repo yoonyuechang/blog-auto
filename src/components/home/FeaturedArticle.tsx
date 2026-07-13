@@ -62,7 +62,7 @@ export default function FeaturedArticle(props: FeaturedArticleProps) {
           <span>{props.publishedAt}</span>
         </div>
 
-        <div className="mt-6 inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/60 px-4 py-2 text-sm font-medium text-text-primary transition-all group-hover:border-emerald-400/50 group-hover:bg-emerald-500/10 group-hover:text-emerald-400">
+        <div className="mt-6 inline-flex items-center gap-1.5 rounded-lg border border-border bg-card/60 px-4 py-2 text-sm font-medium text-text-primary transition-all group-hover:border-emerald-400/50 group-hover:bg-emerald-500/10 group-hover:text-emerald-400 group-hover:shadow-[0_0_12px_rgba(52,211,153,0.15)]">
           읽기 <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
         </div>
       </div>

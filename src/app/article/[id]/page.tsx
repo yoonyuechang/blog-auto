@@ -11,6 +11,8 @@ import TableOfContents from "@/components/article/TableOfContents";
 import ShareButtons from "@/components/article/ShareButtons";
 import NewsletterInline from "@/components/shared/NewsletterInline";
 import AdSense from "@/components/shared/AdSense";
+import AuthorBio from "@/components/article/AuthorBio";
+import Link from "next/link";
 import {
   generateBreadcrumbSchema,
   generateFAQSchema,
@@ -102,6 +104,17 @@ export default async function ArticlePage({ params }: PageProps) {
         />
       )}
 
+      <div className="mb-6 flex flex-wrap gap-2">
+        <Link href={`/category/${article.category}`} className="text-xs font-medium text-text-muted hover:text-emerald-400">
+          #{article.category}
+        </Link>
+        {article.tags && article.tags.split(",").map((tag: string) => (
+          <Link key={tag} href={`/search?q=${encodeURIComponent(tag.trim())}`} className="text-xs text-text-muted hover:text-emerald-400">
+            #{tag.trim()}
+          </Link>
+        ))}
+      </div>
+
       <ArticleHeader
         title={article.title}
         category={article.category}
@@ -145,6 +158,8 @@ export default async function ArticlePage({ params }: PageProps) {
           difficultyLevel: r.difficultyLevel,
         }))}
       />
+
+      <AuthorBio />
     </article>
   );
 }
