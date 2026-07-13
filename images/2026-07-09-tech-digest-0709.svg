@@ -1,7 +1,0 @@
-<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
-<rect width="800" height="400" fill="#09090b"/>
-<rect x="0" y="376" width="800" height="24" fill="#18181b"/>
-<text x="48" y="180" fill="#fafafa" font-size="32" font-weight="700" font-family="system-ui, sans-serif">Today's Tech Digest (07/09)</text>
-<text x="48" y="230" fill="#a1a1aa" font-size="15" font-family="system-ui, sans-serif">2026-07-09 · Dev & AI Digest</text>
-<text x="48" y="260" fill="#52525b" font-family="'SF Mono', 'JetBrains Mono', monospace" font-size="13" text-transform="uppercase" letter-spacing="2">해외뉴스 | AI/개발</text>
-</svg>
