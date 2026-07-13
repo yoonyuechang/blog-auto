@@ -6,6 +6,7 @@ import MarkdownBody from "@/components/article/MarkdownBody";
 import RelatedArticles from "@/components/article/RelatedArticles";
 import ReadingProgress from "@/components/article/ReadingProgress";
 import ArticleFeedback from "@/components/feedback/ArticleFeedback";
+import AdSense from "@/components/shared/AdSense";
 
 export const dynamic = "force-dynamic";
 
@@ -56,6 +57,7 @@ export default async function ArticlePage({ params }: PageProps) {
       />
       <AISummary aiSummary={article.aiSummary} keyPoints={article.keyPoints} />
       <MarkdownBody content={article.content} />
+      <AdSense slot="0000000000" format="auto" />
       <div className="mt-8">
         <ArticleFeedback articleId={article.id} />
       </div>
