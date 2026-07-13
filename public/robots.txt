@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://devpulse.vercel.app/sitemap.xml
+Sitemap: https://blog-auto-woad.vercel.app/sitemap.xml
