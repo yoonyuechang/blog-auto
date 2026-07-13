@@ -23,6 +23,11 @@ export default async function HomePage() {
     take: 3,
   });
 
+  const featured = await db.article.findFirst({
+    where: { status: "approved" },
+    orderBy: { viewCount: "desc" },
+  });
+
   const weeklyTop = await db.article.findMany({
     where: { status: "approved" },
     orderBy: { viewCount: "desc" },
@@ -47,6 +52,11 @@ export default async function HomePage() {
           tags: a.tags,
           publishedAt: a.publishedAt.toISOString().split("T")[0],
         }))}
+        featuredArticle={featured ? {
+          ...featured,
+          tags: featured.tags,
+          publishedAt: featured.publishedAt.toISOString().split("T")[0],
+        } : null}
         weeklyTop={weeklyTop}
         categories={categories.map((c) => c.name)}
       />

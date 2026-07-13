@@ -3,6 +3,9 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { Components } from "react-markdown";
+import CodeBlock from "./CodeBlock";
+import Callout from "./Callout";
+import { isCalloutBlockquote } from "./CalloutBlock";
 
 interface MarkdownBodyProps {
   content: string;
@@ -15,59 +18,56 @@ function slugify(text: string) {
     .replace(/\s+/g, "-");
 }
 
+function extractText(node: React.ReactNode): string {
+  if (typeof node === "string") return node;
+  if (Array.isArray(node)) return node.map(extractText).join("");
+  if ((node as React.ReactElement)?.props?.children) return extractText((node as React.ReactElement).props.children);
+  return "";
+}
+
+function CopyLink({ id }: { id: string }) {
+  return (
+    <button
+      onClick={() => navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#${id}`)}
+      className="ml-1 text-emerald-400 opacity-0 transition-opacity group-hover:opacity-100"
+      aria-label="링크 복사"
+    >
+      #
+    </button>
+  );
+}
+
 const components: Components = {
   h2: ({ children }) => {
-    const text = String(children);
-    const id = slugify(text);
+    const id = slugify(extractText(children));
     return (
       <h2 id={id} className="mb-4 mt-12 border-b border-border pb-2 text-xl font-bold text-text-primary group">
-        <a href={`#${id}`} className="no-underline hover:underline text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity mr-1">#</a>
+        <CopyLink id={id} />
         {children}
       </h2>
     );
   },
   h3: ({ children }) => {
-    const text = String(children);
-    const id = slugify(text);
+    const id = slugify(extractText(children));
     return (
-      <h3 id={id} className="mb-3 mt-8 text-lg font-semibold text-text-primary">
+      <h3 id={id} className="mb-3 mt-8 text-lg font-semibold text-text-primary group">
+        <CopyLink id={id} />
         {children}
       </h3>
     );
   },
-  p: ({ children }) => (
-    <p className="mb-5 text-text-secondary leading-relaxed">{children}</p>
-  ),
+  p: ({ children }) => <p className="mb-5 text-text-secondary leading-relaxed">{children}</p>,
   code: ({ children, className }) => {
     const isInline = !className;
     if (isInline) {
       return <code className="rounded bg-border px-1.5 py-0.5 text-sm text-emerald-400">{children}</code>;
     }
-    return (
-      <code className={`block overflow-x-auto text-sm ${className}`}>
-        {children}
-      </code>
-    );
+    return <CodeBlock className={className}>{String(children).replace(/\n$/, "")}</CodeBlock>;
   },
-  pre: ({ children }) => (
-    <div className="mb-6 group/code relative">
-      <div className="absolute right-2 top-2 z-10">
-        <button
-          onClick={(e) => {
-            const pre = e.currentTarget.closest("div")?.querySelector("pre");
-            if (pre) navigator.clipboard.writeText(pre.textContent ?? "");
-          }}
-          aria-label="코드 복사"
-          className="rounded border border-border bg-card px-2 py-1 text-xs text-text-muted opacity-0 transition-opacity hover:bg-border hover:text-text-primary group-hover/code:opacity-100"
-        >
-          복사
-        </button>
-      </div>
-      <pre className="overflow-x-auto rounded-lg border border-border bg-card p-4 pr-16">
-        {children}
-      </pre>
-    </div>
-  ),
+  pre: ({ children }) => {
+    // When code block is used, pre is just a wrapper — CodeBlock handles its own container
+    return <>{children}</>;
+  },
   ul: ({ children }) => (
     <ul className="mb-5 list-disc space-y-1 pl-5 text-text-secondary marker:text-emerald-400/60">{children}</ul>
   ),
@@ -88,11 +88,21 @@ const components: Components = {
   strong: ({ children }) => (
     <strong className="font-semibold text-text-primary">{children}</strong>
   ),
-  blockquote: ({ children }) => (
-    <blockquote className="my-5 rounded-r-lg border-l-4 border-emerald-400 bg-emerald-950/30 py-3 pl-5 pr-4 text-text-secondary italic">
-      {children}
-    </blockquote>
-  ),
+  blockquote: ({ children }) => {
+    const callout = isCalloutBlockquote(children);
+    if (callout) {
+      return (
+        <Callout type={callout.type} title={callout.title}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{callout.content}</ReactMarkdown>
+        </Callout>
+      );
+    }
+    return (
+      <blockquote className="my-5 rounded-r-lg border-l-4 border-emerald-400 bg-emerald-950/30 py-3 pl-5 pr-4 text-text-secondary italic">
+        {children}
+      </blockquote>
+    );
+  },
   table: ({ children }) => (
     <div className="my-6 overflow-x-auto rounded-lg border border-border">
       <table className="w-full text-sm">{children}</table>

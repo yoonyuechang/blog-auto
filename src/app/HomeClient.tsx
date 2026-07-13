@@ -5,6 +5,7 @@ import CategoryTabs from "@/components/home/CategoryTabs";
 import TrendingCards from "@/components/home/TrendingCards";
 import WeeklyDigest from "@/components/home/WeeklyDigest";
 import ArticleGrid from "@/components/home/ArticleGrid";
+import FeaturedArticle from "@/components/home/FeaturedArticle";
 import AdSense from "@/components/shared/AdSense";
 
 interface Article {
@@ -29,13 +30,14 @@ interface WeeklyArticle {
 
 interface HomeClientProps {
   initialTrending: Article[];
+  featuredArticle: Article | null;
   weeklyTop: WeeklyArticle[];
   categories: string[];
 }
 
 const PAGE_SIZE = 12;
 
-export default function HomeClient({ initialTrending, weeklyTop, categories }: HomeClientProps) {
+export default function HomeClient({ initialTrending, featuredArticle, weeklyTop, categories }: HomeClientProps) {
   const [activeCategory, setActiveCategory] = useState("전체");
   const [articles, setArticles] = useState<Article[]>([]);
   const [page, setPage] = useState(1);
@@ -80,6 +82,7 @@ export default function HomeClient({ initialTrending, weeklyTop, categories }: H
 
   return (
     <>
+      {featuredArticle && <FeaturedArticle {...featuredArticle} />}
       <CategoryTabs categories={categories} activeCategory={activeCategory} onSelect={setActiveCategory} />
       <TrendingCards articles={initialTrending} />
       <WeeklyDigest articles={weeklyTop} />
