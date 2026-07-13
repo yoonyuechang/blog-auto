@@ -42,3 +42,86 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+html { scroll-behavior: smooth; }
+::selection { background: rgba(52, 211, 153, 0.3); }
+
+/* Code blocks */
+pre {
+  background: #0d1117 !important;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+code {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+}
+:not(pre) > code {
+  background: rgba(52, 211, 153, 0.1);
+  color: #34D399;
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.875em;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+th {
+  background: #1E293B;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #334155;
+}
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #1E293B;
+}
+tr:hover td {
+  background: rgba(30, 41, 59, 0.5);
+}
+
+/* Blockquotes */
+blockquote {
+  border-left: 3px solid #34D399;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  background: rgba(52, 211, 153, 0.05);
+  border-radius: 0 8px 8px 0;
+  color: #94A3B8;
+}
+
+/* Focus visible for accessibility */
+:focus-visible {
+  outline: 2px solid #34D399;
+  outline-offset: 2px;
+}
+
+/* Pulse animation for logo */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.5); }
+}
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #34D399, #22D3EE);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card glow hover */
+.card-glow:hover {
+  box-shadow: 0 0 20px rgba(52, 211, 153, 0.1);
+}
