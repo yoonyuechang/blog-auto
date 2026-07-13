@@ -34,11 +34,12 @@ interface HomeClientProps {
   featuredArticle: Article | null;
   weeklyTop: WeeklyArticle[];
   categories: string[];
+  categoryCounts: Record<string, number>;
 }
 
 const PAGE_SIZE = 12;
 
-export default function HomeClient({ initialTrending, featuredArticle, weeklyTop, categories }: HomeClientProps) {
+export default function HomeClient({ initialTrending, featuredArticle, weeklyTop, categories, categoryCounts }: HomeClientProps) {
   const [activeCategory, setActiveCategory] = useState("전체");
   const [articles, setArticles] = useState<Article[]>([]);
   const [page, setPage] = useState(1);
@@ -84,7 +85,7 @@ export default function HomeClient({ initialTrending, featuredArticle, weeklyTop
   return (
     <>
       {featuredArticle && <FeaturedArticle {...featuredArticle} />}
-      <CategoryShowcase />
+      <CategoryShowcase counts={categoryCounts} />
       <CategoryTabs categories={categories} activeCategory={activeCategory} onSelect={setActiveCategory} />
       <TrendingCards articles={initialTrending} />
       <WeeklyDigest articles={weeklyTop} />

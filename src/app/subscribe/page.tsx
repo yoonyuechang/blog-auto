@@ -33,19 +33,24 @@ export default function SubscribePage() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || loading) return;
     setLoading(true);
+    setError(false);
     try {
-      await fetch("/api/newsletter", {
+      const res = await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-      setSubscribed(true);
+      if (res.ok) setSubscribed(true);
+      else setError(true);
+    } catch {
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -121,6 +126,9 @@ export default function SubscribePage() {
             {loading ? "구독 중..." : "구독하기"}
           </Button>
         </form>
+        {error && (
+          <p className="mt-2 text-center text-sm text-red-400">오류가 발생했습니다. 다시 시도해 주세요.</p>
+        )}
       </section>
 
       <section className="mx-auto mt-12 text-center">

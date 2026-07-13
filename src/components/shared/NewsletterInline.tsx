@@ -5,18 +5,22 @@ import { Mail, Check } from "lucide-react";
 
 export default function NewsletterInline() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "done">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
     setStatus("loading");
-    await fetch("/api/newsletter", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-    setStatus("done");
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      setStatus(res.ok ? "done" : "error");
+    } catch {
+      setStatus("error");
+    }
   };
 
   return (
@@ -30,6 +34,8 @@ export default function NewsletterInline() {
             <Check size={18} />
             <span className="text-sm font-medium">구독해 주셔서 감사합니다!</span>
           </div>
+        ) : status === "error" ? (
+          <div className="text-center text-sm text-red-400">오류가 발생했습니다. 다시 시도해 주세요.</div>
         ) : (
           <form onSubmit={handleSubmit} className="mx-auto flex max-w-md gap-2">
             <label htmlFor="newsletter-email" className="sr-only">이메일 주소</label>

@@ -19,17 +19,23 @@ export default function HeroSection({
 }: HeroSectionProps) {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
-    await fetch("/api/newsletter", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-    setSubscribed(true);
-    setEmail("");
+    if (!email || loading) return;
+    setLoading(true);
+    try {
+      await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      setSubscribed(true);
+      setEmail("");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -106,8 +112,8 @@ export default function HeroSection({
           className="flex-1 rounded-lg border border-border bg-card/60 px-4 py-3 text-sm text-text-primary placeholder-text-muted backdrop-blur-sm focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400/50"
           required
         />
-        <Button type="submit" disabled={subscribed} size="lg">
-          {subscribed ? "구독 완료!" : "구독하기"}
+        <Button type="submit" disabled={subscribed || loading} size="lg">
+          {subscribed ? "구독 완료!" : loading ? "구독 중..." : "구독하기"}
         </Button>
       </form>
     </section>

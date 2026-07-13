@@ -43,6 +43,16 @@ export default async function HomePage() {
 
   const categories = await db.category.findMany();
 
+  const categoryCountsRows = await db.article.groupBy({
+    by: ["category"],
+    where: { status: "approved" },
+    _count: true,
+  });
+  const categoryCounts: Record<string, number> = {};
+  for (const row of categoryCountsRows) {
+    categoryCounts[row.category] = row._count;
+  }
+
   return (
     <>
       <HeroSection totalArticles={totalArticles} todayArticles={todayArticles} />
@@ -59,6 +69,7 @@ export default async function HomePage() {
         } : null}
         weeklyTop={weeklyTop}
         categories={categories.map((c) => c.name)}
+        categoryCounts={categoryCounts}
       />
       <NewsletterInline />
     </>
