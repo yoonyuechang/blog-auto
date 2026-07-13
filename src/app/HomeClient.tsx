@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import CategoryTabs from "@/components/home/CategoryTabs";
 import TrendingCards from "@/components/home/TrendingCards";
 import ArticleGrid from "@/components/home/ArticleGrid";
+import AdSense from "@/components/shared/AdSense";
 
 interface Article {
   id: number;
@@ -66,6 +67,7 @@ export default function HomeClient({ initialTrending, categories }: HomeClientPr
     <>
       <CategoryTabs categories={categories} activeCategory={activeCategory} onSelect={setActiveCategory} />
       <TrendingCards articles={initialTrending} />
+      <AdSense slot="0000000000" format="horizontal" />
       <ArticleGrid articles={articles} loading={loading} onLoadMore={handleLoadMore} hasMore={hasMore} />
     </>
   );
