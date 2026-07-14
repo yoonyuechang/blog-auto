@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, Globe, Mail, Menu, X, ChevronsLeft, ChevronsRight, TrendingUp } from "lucide-react";
+import { LayoutDashboard, FileText, Globe, Mail, Menu, X, ChevronsLeft, ChevronsRight, TrendingUp, Activity } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "대시보드", icon: LayoutDashboard },
@@ -11,6 +11,7 @@ const navItems = [
   { href: "/admin/sources", label: "소스 관리", icon: Globe },
   { href: "/admin/newsletter", label: "뉴스레터", icon: Mail },
   { href: "/admin/analytics", label: "분석", icon: TrendingUp },
+  { href: "/admin/system", label: "시스템", icon: Activity },
 ];
 
 export default function AdminSidebar() {

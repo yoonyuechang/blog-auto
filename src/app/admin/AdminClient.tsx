@@ -3,12 +3,14 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ListChecks, Rss, Users, BarChart3, FileText, Eye, Mail, Globe, Plus, Download, Sparkles, TrendingUp } from "lucide-react";
+import { Activity } from "lucide-react";
 import StatsCard from "@/components/admin/StatsCard";
 import ApprovalQueue from "@/components/admin/ApprovalQueue";
 import SourceManager from "@/components/admin/SourceManager";
 import SubscriberList from "@/components/admin/SubscriberList";
 import StatsChart from "@/components/admin/StatsChart";
 import ArticleTable from "@/components/admin/ArticleTable";
+import HealthDashboard from "@/components/admin/HealthDashboard";
 
 interface AdminData {
   kpi: {
@@ -76,10 +78,11 @@ const tabs = [
   { key: "sources" as const, label: "소스 관리", icon: Rss },
   { key: "subscribers" as const, label: "구독자", icon: Users },
   { key: "analytics" as const, label: "분석", icon: TrendingUp },
+  { key: "system" as const, label: "시스템", icon: Activity },
 ];
 
 export default function AdminClient({ data }: { data: AdminData }) {
-  const [tab, setTab] = useState<"stats" | "articles" | "queue" | "sources" | "subscribers" | "analytics">("stats");
+  const [tab, setTab] = useState<"stats" | "articles" | "queue" | "sources" | "subscribers" | "analytics" | "system">("stats");
   const [stats, setStats] = useState<Stats | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [bulkAnalyzing, setBulkAnalyzing] = useState(false);
@@ -363,6 +366,7 @@ export default function AdminClient({ data }: { data: AdminData }) {
             </Link>
           </div>
         )}
+        {tab === "system" && <HealthDashboard />}
       </div>
     </div>
   );
