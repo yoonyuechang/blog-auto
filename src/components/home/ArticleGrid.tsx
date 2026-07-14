@@ -8,6 +8,8 @@ import Skeleton from "@/components/shared/Skeleton";
 import DateFormatter from "@/components/shared/DateFormatter";
 import InfiniteScroll from "@/components/shared/InfiniteScroll";
 import { Eye, Clock } from "lucide-react";
+import QualityBadge from "@/components/shared/QualityBadge";
+import { calculateQualityScore } from "@/lib/content-quality";
 
 interface Article {
   id: number;
@@ -87,7 +89,17 @@ export default function ArticleGrid({ articles, loading, onLoadMore, hasMore }: 
                   <span className={`h-2 w-2 rounded-full ${CATEGORY_DOT[article.category] || "bg-cyan-400"}`} />
                   <span className="text-xs text-text-muted">{article.category}</span>
                 </div>
-                <Badge level={article.difficultyLevel as "입문/초급" | "중급" | "고급"} />
+                <div className="flex items-center gap-1.5">
+                  <Badge level={article.difficultyLevel as "입문/초급" | "중급" | "고급"} />
+                  <QualityBadge
+                    score={calculateQualityScore({
+                      content: article.content || "",
+                      aiSummary: article.aiSummary,
+                      tags: article.tags,
+                      source: article.source,
+                    }).score}
+                  />
+                </div>
               </div>
 
               <h3 className="mt-3 mb-2 text-sm font-bold leading-tight text-text-primary line-clamp-2">

@@ -19,6 +19,8 @@ import ViewCounter from "@/components/article/ViewCounter";
 import ArticleNav from "@/components/article/ArticleNav";
 import ArticleHistoryTracker from "@/components/article/ArticleHistoryTracker";
 import Link from "next/link";
+import { calculateQualityScore } from "@/lib/content-quality";
+import QualityBadge from "@/components/shared/QualityBadge";
 import {
   generateBreadcrumbSchema,
   generateFAQSchema,
@@ -112,6 +114,13 @@ export default async function ArticlePage({ params }: PageProps) {
     });
     const faqSchema = generateFAQSchema(faqs);
 
+    const quality = calculateQualityScore({
+      content: article.content,
+      aiSummary: article.aiSummary,
+      tags: article.tags,
+      source: article.source,
+    });
+
     const updatedDate = article.updatedAt.toISOString().split("T")[0];
 
     return (
@@ -133,7 +142,7 @@ export default async function ArticlePage({ params }: PageProps) {
           />
         )}
 
-        <div className="mb-6 flex flex-wrap gap-2">
+        <div className="mb-6 flex flex-wrap items-center gap-2">
           <Link href={`/category/${article.category}`} className="text-xs font-medium text-text-muted hover:text-emerald-400">
             #{article.category}
           </Link>
@@ -142,6 +151,9 @@ export default async function ArticlePage({ params }: PageProps) {
               #{tag}
             </Link>
           ))}
+          <div className="ml-auto">
+            <QualityBadge score={quality.score} />
+          </div>
         </div>
 
         <ArticleHeader

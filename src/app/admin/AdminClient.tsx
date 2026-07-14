@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ListChecks, Rss, Users, BarChart3, FileText, Eye, Mail, Globe, Plus, Download, Sparkles } from "lucide-react";
+import { ListChecks, Rss, Users, BarChart3, FileText, Eye, Mail, Globe, Plus, Download, Sparkles, TrendingUp } from "lucide-react";
 import StatsCard from "@/components/admin/StatsCard";
 import ApprovalQueue from "@/components/admin/ApprovalQueue";
 import SourceManager from "@/components/admin/SourceManager";
@@ -75,10 +75,11 @@ const tabs = [
   { key: "queue" as const, label: "승인 큐", icon: ListChecks },
   { key: "sources" as const, label: "소스 관리", icon: Rss },
   { key: "subscribers" as const, label: "구독자", icon: Users },
+  { key: "analytics" as const, label: "분석", icon: TrendingUp },
 ];
 
 export default function AdminClient({ data }: { data: AdminData }) {
-  const [tab, setTab] = useState<"stats" | "articles" | "queue" | "sources" | "subscribers">("stats");
+  const [tab, setTab] = useState<"stats" | "articles" | "queue" | "sources" | "subscribers" | "analytics">("stats");
   const [stats, setStats] = useState<Stats | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [bulkAnalyzing, setBulkAnalyzing] = useState(false);
@@ -350,6 +351,18 @@ export default function AdminClient({ data }: { data: AdminData }) {
         )}
         {tab === "sources" && <SourceManager sources={data.sources} onToggle={handleToggleSource} onAdd={handleAddSource} />}
         {tab === "subscribers" && <SubscriberList subscribers={data.subscribers} />}
+        {tab === "analytics" && (
+          <div className="text-center">
+            <p className="mb-4 text-sm text-text-muted">상세 분석 대시보드</p>
+            <Link
+              href="/admin/analytics"
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-600"
+            >
+              <TrendingUp size={16} />
+              분석 대시보드 열기
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
