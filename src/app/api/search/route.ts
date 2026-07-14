@@ -1,20 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
+import { cache } from "@/lib/cache";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
-const rateLimit = new Map<string, { count: number; start: number }>();
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimit.get(ip);
-  if (!entry || now - entry.start > 60000) {
-    rateLimit.set(ip, { count: 1, start: now });
-    return true;
-  }
-  if (entry.count >= 100) return false;
-  entry.count++;
-  return true;
-}
+const CACHE_TTL = 30_000;
 
 const suggestions = [
   "TypeScript", "React", "Python", "머신러닝", "AWS",
@@ -24,7 +14,8 @@ const suggestions = [
 
 export async function GET(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
-  if (!checkRateLimit(ip)) {
+  const rl = checkRateLimit(`search:${ip}`, RATE_LIMITS.search.limit, RATE_LIMITS.search.windowMs);
+  if (!rl.allowed) {
     return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
   }
 
@@ -33,9 +24,12 @@ export async function GET(req: NextRequest) {
     const q = searchParams.get("q")?.trim();
     const category = searchParams.get("category");
     const sort = searchParams.get("sort") || "newest";
-
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
     const limit = Math.min(50, Math.max(1, parseInt(searchParams.get("limit") || "12")));
+
+    const cacheKey = `search:${JSON.stringify({ q, category, sort, page, limit })}`;
+    const cached = cache.get(cacheKey);
+    if (cached) return NextResponse.json(cached);
 
     const where: Prisma.ArticleWhereInput = { status: "approved" };
 
@@ -47,8 +41,6 @@ export async function GET(req: NextRequest) {
     let orderBy: Prisma.ArticleOrderByWithRelationInput = {};
     switch (sort) {
       case "popular":
-        orderBy = { viewCount: "desc" };
-        break;
       case "views":
         orderBy = { viewCount: "desc" };
         break;
@@ -81,13 +73,16 @@ export async function GET(req: NextRequest) {
       .filter(s => s.toLowerCase().includes((q || "").toLowerCase()))
       .slice(0, 5);
 
-    return NextResponse.json({
+    const result = {
       articles,
       total,
       page,
       limit,
       suggestions: q ? hitSuggestions : suggestions.slice(0, 8),
-    });
+    };
+
+    cache.set(cacheKey, result, CACHE_TTL);
+    return NextResponse.json(result);
   } catch {
     return NextResponse.json({ error: "Failed to search" }, { status: 500 });
   }

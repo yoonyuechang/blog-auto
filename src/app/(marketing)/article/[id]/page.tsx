@@ -54,11 +54,25 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       publishedTime: article.publishedAt.toISOString(),
       modifiedTime: article.updatedAt.toISOString(),
       locale: "ko_KR",
+      images: [
+        {
+          url: `${SITE_URL}/api/og?title=${encodeURIComponent(article.title)}&category=${encodeURIComponent(article.category)}`,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title: article.title,
       description,
+      images: [
+        {
+          url: `${SITE_URL}/api/og?title=${encodeURIComponent(article.title)}&category=${encodeURIComponent(article.category)}`,
+          alt: article.title,
+        },
+      ],
     },
   };
 }

@@ -19,6 +19,8 @@ const ICON_MAP: Record<string, string> = {
   "layers": "\uD83D\uDCDA",
 };
 
+const SITE_URL = "https://blog-auto-woad.vercel.app";
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const category = await db.category.findUnique({ where: { slug: params.slug } });
   if (!category) return {};
@@ -34,6 +36,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: `${category.name} | DevPulse`,
       description: category.description || `${category.name} \uCEA4\uB3C4`,
       type: "website",
+      images: [
+        {
+          url: `${SITE_URL}/api/og?title=${encodeURIComponent(category.name)}&category=${encodeURIComponent(category.slug)}`,
+          width: 1200,
+          height: 630,
+          alt: category.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${category.name} | DevPulse`,
+      images: [
+        {
+          url: `${SITE_URL}/api/og?title=${encodeURIComponent(category.name)}&category=${encodeURIComponent(category.slug)}`,
+          alt: category.name,
+        },
+      ],
     },
   };
 }

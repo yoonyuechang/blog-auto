@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
+import { cache } from "@/lib/cache";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
+
+const CACHE_TTL = 60_000;
 
 export async function GET(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown";
+  const rl = checkRateLimit(`articles:${ip}`, RATE_LIMITS.articles.limit, RATE_LIMITS.articles.windowMs);
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
+  }
+
   try {
     const { searchParams } = new URL(req.url);
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
@@ -11,9 +21,12 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get("status");
     const difficulty = searchParams.get("difficulty");
     const q = searchParams.get("q");
-
     const exclude = searchParams.get("exclude");
     const tags = searchParams.get("tags");
+
+    const cacheKey = `articles:${JSON.stringify({ page, limit, category, status, difficulty, q, exclude, tags })}`;
+    const cached = cache.get<{ articles: any[]; total: number; page: number; limit: number }>(cacheKey);
+    if (cached) return NextResponse.json(cached);
 
     const where: Prisma.ArticleWhereInput = {};
     if (status) where.status = status;
@@ -43,7 +56,9 @@ export async function GET(req: NextRequest) {
       db.article.count({ where }),
     ]);
 
-    return NextResponse.json({ articles, total, page, limit });
+    const result = { articles, total, page, limit };
+    cache.set(cacheKey, result, CACHE_TTL);
+    return NextResponse.json(result);
   } catch {
     return NextResponse.json({ error: "Failed to fetch articles" }, { status: 500 });
   }
@@ -65,6 +80,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "title, source, sourceUrl required" }, { status: 400 });
     }
     const article = await db.article.create({ data: data as any });
+    cache.sweep(); // invalidate stale article caches on mutation
     return NextResponse.json(article, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Failed to create article" }, { status: 500 });
