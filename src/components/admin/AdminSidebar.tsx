@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, Globe, Mail, Menu, X } from "lucide-react";
+import { LayoutDashboard, FileText, Globe, Mail, Menu, X, ChevronsLeft, ChevronsRight } from "lucide-react";
 
 const navItems = [
   { href: "/admin", label: "대시보드", icon: LayoutDashboard },
@@ -15,6 +15,21 @@ const navItems = [
 export default function AdminSidebar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [sourceHealth, setSourceHealth] = useState<Record<number, boolean>>({});
+
+  useEffect(() => {
+    fetch("/api/admin/sources")
+      .then((r) => r.json())
+      .then((sources: any[]) => {
+        const health: Record<number, boolean> = {};
+        sources.forEach((s: any) => { health[s.id] = s.isActive; });
+        setSourceHealth(health);
+      })
+      .catch(() => {});
+  }, []);
+
+  const hasUnhealthySource = Object.values(sourceHealth).some((v) => !v);
 
   const content = (
     <nav className="flex flex-1 flex-col gap-1 p-4">
@@ -30,7 +45,10 @@ export default function AdminSidebar() {
             }`}
           >
             <Icon size={18} />
-            {label}
+            {!collapsed && label}
+            {href === "/admin/sources" && hasUnhealthySource && (
+              <span className="ml-auto h-2 w-2 rounded-full bg-red-400" />
+            )}
           </Link>
         );
       })}
@@ -39,7 +57,6 @@ export default function AdminSidebar() {
 
   return (
     <>
-      {/* Mobile toggle */}
       <button
         onClick={() => setMobileOpen(true)}
         className="fixed left-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-text-muted lg:hidden"
@@ -47,16 +64,20 @@ export default function AdminSidebar() {
         <Menu size={20} />
       </button>
 
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-60 shrink-0 flex-col border-r border-border bg-card">
-        <div className="flex h-16 items-center gap-2 border-b border-border px-5">
-          <span className="text-lg font-bold text-text-primary">DevPulse</span>
+      <aside className={`hidden lg:flex shrink-0 flex-col border-r border-border bg-card transition-all ${collapsed ? "w-16" : "w-60"}`}>
+        <div className={`flex h-16 items-center border-b border-border ${collapsed ? "justify-center px-2" : "gap-2 px-5"}`}>
+          {!collapsed && <span className="text-lg font-bold text-text-primary">DevPulse</span>}
           <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className={`text-text-muted hover:text-text-primary ${collapsed ? "" : "ml-auto"}`}
+          >
+            {collapsed ? <ChevronsRight size={16} /> : <ChevronsLeft size={16} />}
+          </button>
         </div>
         {content}
       </aside>
 
-      {/* Mobile overlay */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/60" onClick={() => setMobileOpen(false)} />

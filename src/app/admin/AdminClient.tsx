@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ListChecks, Rss, Users, BarChart3, FileText, Eye, Mail, Globe, Plus, Download } from "lucide-react";
+import { ListChecks, Rss, Users, BarChart3, FileText, Eye, Mail, Globe, Plus, Download, Sparkles } from "lucide-react";
 import StatsCard from "@/components/admin/StatsCard";
 import ApprovalQueue from "@/components/admin/ApprovalQueue";
 import SourceManager from "@/components/admin/SourceManager";
 import SubscriberList from "@/components/admin/SubscriberList";
 import StatsChart from "@/components/admin/StatsChart";
+import ArticleTable from "@/components/admin/ArticleTable";
 
 interface AdminData {
   kpi: {
@@ -34,6 +35,7 @@ interface AdminData {
     fetchInterval: string;
     isActive: boolean;
     category: string;
+    lastFetched?: string;
   }[];
   subscribers: {
     id: number;
@@ -68,15 +70,18 @@ const categoryColors: Record<string, string> = {
 };
 
 const tabs = [
-  { key: "stats" as const, label: "통계", icon: BarChart3 },
+  { key: "stats" as const, label: "대시보드", icon: BarChart3 },
+  { key: "articles" as const, label: "아티클 관리", icon: FileText },
   { key: "queue" as const, label: "승인 큐", icon: ListChecks },
   { key: "sources" as const, label: "소스 관리", icon: Rss },
   { key: "subscribers" as const, label: "구독자", icon: Users },
 ];
 
 export default function AdminClient({ data }: { data: AdminData }) {
-  const [tab, setTab] = useState<"stats" | "queue" | "sources" | "subscribers">("stats");
+  const [tab, setTab] = useState<"stats" | "articles" | "queue" | "sources" | "subscribers">("stats");
   const [stats, setStats] = useState<Stats | null>(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [bulkAnalyzing, setBulkAnalyzing] = useState(false);
 
   useEffect(() => {
     fetch("/api/stats")
@@ -126,6 +131,34 @@ export default function AdminClient({ data }: { data: AdminData }) {
       body: JSON.stringify(source),
     });
     window.location.reload();
+  };
+
+  const handleAnalyzeOne = async (articleId: number) => {
+    setAnalyzing(true);
+    try {
+      await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ articleId }),
+      });
+      window.location.reload();
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  const handleBulkAnalyze = async () => {
+    setBulkAnalyzing(true);
+    try {
+      await fetch("/api/analyze", { method: "POST" });
+      window.location.reload();
+    } finally {
+      setBulkAnalyzing(false);
+    }
+  };
+
+  const handleDeleteArticle = async (id: number) => {
+    await fetch(`/api/articles/${id}`, { method: "DELETE" });
   };
 
   const today = new Date().toLocaleDateString("ko-KR", {
@@ -184,7 +217,6 @@ export default function AdminClient({ data }: { data: AdminData }) {
 
       {tab === "stats" && (
         <div className="space-y-6">
-          {/* Recent articles table */}
           <div className="rounded-xl border border-border bg-card p-6">
             <h2 className="mb-4 text-sm font-semibold text-text-muted">최근 아티클</h2>
             {data.recentArticles.length === 0 ? (
@@ -229,6 +261,30 @@ export default function AdminClient({ data }: { data: AdminData }) {
             )}
           </div>
 
+          {/* Content Calendar */}
+          <div className="rounded-xl border border-border bg-card p-6">
+            <h2 className="mb-4 text-sm font-semibold text-text-muted">콘텐츠 캘린더 (이번 주)</h2>
+            <ContentCalendar articles={data.recentArticles} />
+          </div>
+
+          {/* Source Health */}
+          <div className="rounded-xl border border-border bg-card p-6">
+            <h2 className="mb-4 text-sm font-semibold text-text-muted">소스 상태</h2>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {data.sources.map((source) => (
+                <div key={source.id} className="flex items-center gap-3 rounded-lg border border-border p-3">
+                  <span className={`h-2.5 w-2.5 rounded-full ${source.isActive ? "bg-emerald-400" : "bg-red-400"}`} />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-text-primary">{source.name}</p>
+                    <p className="text-xs text-text-muted">
+                      {source.lastFetched ? `마지막 수집: ${source.lastFetched}` : "수집 이력 없음"}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           {stats && (
             <div className="grid gap-6 lg:grid-cols-2">
               <div className="rounded-xl border border-border bg-card p-6">
@@ -256,11 +312,96 @@ export default function AdminClient({ data }: { data: AdminData }) {
         </div>
       )}
 
+      {tab === "articles" && (
+        <div className="rounded-xl border border-border bg-card p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-text-muted">전체 아티클</h2>
+            <div className="flex gap-2">
+              <button
+                onClick={handleBulkAnalyze}
+                disabled={bulkAnalyzing}
+                className="flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-600 disabled:opacity-50"
+              >
+                <Sparkles size={14} />
+                {bulkAnalyzing ? "분석 중..." : "전체 분석"}
+              </button>
+            </div>
+          </div>
+          <ArticleTable onDelete={handleDeleteArticle} />
+        </div>
+      )}
+
       <div className="rounded-xl border border-border bg-card p-6">
-        {tab === "queue" && <ApprovalQueue articles={data.pendingArticles} onApprove={handleApprove} onReject={handleReject} />}
+        {tab === "queue" && (
+          <div>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-text-muted">승인 대기</h2>
+              <button
+                onClick={handleBulkAnalyze}
+                disabled={bulkAnalyzing}
+                className="flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-text-muted transition-colors hover:text-text-primary disabled:opacity-50"
+              >
+                <Sparkles size={14} />
+                {bulkAnalyzing ? "분석 중..." : "AI 전체 분석"}
+              </button>
+            </div>
+            <ApprovalQueue articles={data.pendingArticles} onApprove={handleApprove} onReject={handleReject} />
+          </div>
+        )}
         {tab === "sources" && <SourceManager sources={data.sources} onToggle={handleToggleSource} onAdd={handleAddSource} />}
         {tab === "subscribers" && <SubscriberList subscribers={data.subscribers} />}
       </div>
+    </div>
+  );
+}
+
+function ContentCalendar({ articles }: { articles: { id: number; title: string; createdAt: string; category: string }[] }) {
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+  weekStart.setHours(0, 0, 0, 0);
+
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+
+  const days = ["월", "화", "수", "목", "금", "토", "일"];
+  const weekArticles: Record<string, typeof articles> = {};
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(weekStart);
+    d.setDate(weekStart.getDate() + i);
+    const key = d.toISOString().split("T")[0];
+    weekArticles[key] = [];
+  }
+
+  articles.forEach((a) => {
+    const dateStr = typeof a.createdAt === "string" ? a.createdAt : new Date(a.createdAt).toISOString().split("T")[0];
+    if (weekArticles[dateStr]) {
+      weekArticles[dateStr].push(a);
+    }
+  });
+
+  return (
+    <div className="grid grid-cols-7 gap-2">
+      {days.map((day, i) => {
+        const d = new Date(weekStart);
+        d.setDate(weekStart.getDate() + i);
+        const key = d.toISOString().split("T")[0];
+        const isToday = key === now.toISOString().split("T")[0];
+        return (
+          <div key={day} className={`rounded-lg border p-2 ${isToday ? "border-emerald-500 bg-emerald-500/10" : "border-border"}`}>
+            <div className="mb-1 text-center text-xs font-medium text-text-muted">{day} {d.getDate()}</div>
+            <div className="space-y-1">
+              {weekArticles[key]?.map((a) => (
+                <div key={a.id} className="truncate rounded bg-card px-1.5 py-0.5 text-[10px] text-text-primary" title={a.title}>
+                  {a.title.length > 8 ? a.title.slice(0, 8) + "…" : a.title}
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
+import WebVitals from "@/components/shared/WebVitals";
+import PerformanceOverlay from "@/components/shared/PerformanceOverlay";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -89,6 +91,8 @@ gtag('config', 'G-XXXXXXXXXX');`}
           본문으로 건너뛰기
         </a>
         {children}
+        <WebVitals />
+        <PerformanceOverlay />
       </body>
     </html>
   );
