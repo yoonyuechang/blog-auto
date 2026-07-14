@@ -57,6 +57,22 @@ export default async function HomePage() {
     categoryCounts[row.category] = row._count;
   }
 
+  const allArticles = await db.article.findMany({
+    where: { status: "approved" },
+    select: { tags: true },
+  });
+  const tagCounts: Record<string, number> = {};
+  for (const a of allArticles) {
+    if (a.tags) {
+      try {
+        const parsed = JSON.parse(a.tags);
+        if (Array.isArray(parsed)) {
+          for (const t of parsed) tagCounts[t] = (tagCounts[t] || 0) + 1;
+        }
+      } catch {}
+    }
+  }
+
   return (
     <>
       <HeroSection totalArticles={totalArticles} todayArticles={todayArticles} />
@@ -74,6 +90,7 @@ export default async function HomePage() {
         weeklyTop={weeklyTop}
         categories={categories.map((c) => c.name)}
         categoryCounts={categoryCounts}
+        tagCounts={tagCounts}
       />
       <NewsletterInline />
     </>

@@ -9,6 +9,7 @@ import ReadingProgress from "@/components/article/ReadingProgress";
 import ArticleFeedback from "@/components/feedback/ArticleFeedback";
 import TableOfContents from "@/components/article/TableOfContents";
 import ShareButtons from "@/components/article/ShareButtons";
+import BookmarkButton from "@/components/article/BookmarkButton";
 import NewsletterInline from "@/components/shared/NewsletterInline";
 import AdSense from "@/components/shared/AdSense";
 import AuthorBio from "@/components/article/AuthorBio";
@@ -137,6 +138,7 @@ export default async function ArticlePage({ params }: PageProps) {
           title={article.title}
           url={`${SITE_URL}/article/${id}`}
         />
+        <BookmarkButton articleId={article.id} />
       </div>
 
       <div className="mt-6 rounded-xl border border-border bg-card p-6">

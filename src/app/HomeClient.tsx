@@ -9,6 +9,7 @@ import FeaturedArticle from "@/components/home/FeaturedArticle";
 import AdSense from "@/components/shared/AdSense";
 import CategoryShowcase from "@/components/home/CategoryShowcase";
 import NewsletterBanner from "@/components/home/NewsletterBanner";
+import TagCloud from "@/components/home/TagCloud";
 
 interface Article {
   id: number;
@@ -36,11 +37,12 @@ interface HomeClientProps {
   weeklyTop: WeeklyArticle[];
   categories: string[];
   categoryCounts: Record<string, number>;
+  tagCounts: Record<string, number>;
 }
 
 const PAGE_SIZE = 12;
 
-export default function HomeClient({ initialTrending, featuredArticle, weeklyTop, categories, categoryCounts }: HomeClientProps) {
+export default function HomeClient({ initialTrending, featuredArticle, weeklyTop, categories, categoryCounts, tagCounts }: HomeClientProps) {
   const [activeCategory, setActiveCategory] = useState("전체");
   const [articles, setArticles] = useState<Article[]>([]);
   const [page, setPage] = useState(1);
@@ -87,6 +89,7 @@ export default function HomeClient({ initialTrending, featuredArticle, weeklyTop
     <>
       {featuredArticle && <FeaturedArticle {...featuredArticle} />}
       <CategoryShowcase counts={categoryCounts} />
+      <TagCloud tags={tagCounts} />
       <CategoryTabs categories={categories} activeCategory={activeCategory} onSelect={setActiveCategory} />
       <TrendingCards articles={initialTrending} />
       <WeeklyDigest articles={weeklyTop} />
