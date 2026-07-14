@@ -35,6 +35,20 @@ export default function NewsletterBanner() {
           <p className="mx-auto mt-2 max-w-md text-sm text-text-secondary">
             매일 아침 AI가 요약한 최신 기술 뉴스를 이메일로 받아보세요
           </p>
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-3 text-xs text-text-muted">
+            <span className="flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              이미 1,200명이 구독 중
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+              AI 큐레이션
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              무료
+            </span>
+          </div>
 
           {submitted ? (
             <p className="mt-4 text-sm font-medium text-emerald-400">

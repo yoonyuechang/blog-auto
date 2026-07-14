@@ -127,8 +127,41 @@ export default function HeroSection({
         ))}
       </div>
 
+      {/* Social proof */}
+      <div className="mx-auto mt-8 flex flex-col items-center gap-3">
+        <p className="text-sm text-text-muted">
+          이미 <strong className="text-text-primary">1,000+</strong> 개발자가 구독하고 있습니다
+        </p>
+        <div className="flex -space-x-2">
+          {[0,1,2,3].map((i) => (
+            <div
+              key={i}
+              className="h-8 w-8 rounded-full border-2 border-background bg-gradient-to-br from-emerald-400 to-cyan-400"
+              style={{ opacity: 1 - i * 0.15 }}
+            />
+          ))}
+          <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-card text-[10px] font-medium text-text-muted">
+            +1k
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-text-muted">
+          <span className="flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            매주 화요일 배포
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+            AI 큐레이션
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            무료
+          </span>
+        </div>
+      </div>
+
       {/* Subscribe form */}
-      <form onSubmit={handleSubscribe} aria-label="뉴스레터 구독" className="mx-auto mt-10 flex max-w-md gap-2">
+      <form onSubmit={handleSubscribe} aria-label="뉴스레터 구독" className="mx-auto mt-8 flex max-w-md gap-2">
         <label htmlFor="hero-email" className="sr-only">이메일 주소</label>
         <input
           id="hero-email"

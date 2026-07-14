@@ -108,9 +108,8 @@ export default function Header() {
 
         {/* Search + mobile toggle */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }))}
-            aria-label="검색 열기 (Ctrl+K)"
+          <Link
+            href="/search"
             className="hidden items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-1.5 text-sm text-text-muted transition-colors hover:border-border hover:text-text-secondary md:flex"
           >
             <span className="relative">
@@ -119,7 +118,7 @@ export default function Header() {
             </span>
             <span>검색</span>
             <kbd className="ml-1 rounded border border-border bg-bg px-1.5 py-0.5 font-mono text-[10px] text-text-muted">⌘K</kbd>
-          </button>
+          </Link>
 
           <button
             className="rounded-md p-2 text-text-muted transition-colors hover:text-text-primary md:hidden"
@@ -182,18 +181,15 @@ export default function Header() {
                 >
                   구독
                 </Link>
-                <button
-                  onClick={() => {
-                    setMobileOpen(false);
-                    window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true }));
-                  }}
-                  aria-label="검색 열기 (Ctrl+K)"
+                <Link
+                  href="/search"
+                  onClick={() => setMobileOpen(false)}
                   className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-sm text-text-secondary hover:bg-card hover:text-text-primary"
                 >
                   <Search size={16} />
                   검색
                   <kbd className="ml-auto rounded border border-border bg-bg px-1.5 py-0.5 font-mono text-[10px] text-text-muted">⌘K</kbd>
-                </button>
+                </Link>
               </div>
             </div>
           </nav>

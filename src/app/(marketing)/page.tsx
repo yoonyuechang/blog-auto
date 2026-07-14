@@ -3,6 +3,7 @@ import HeroSection from "@/components/home/HeroSection";
 import HomeClient from "./HomeClient";
 import NewsletterInline from "@/components/shared/NewsletterInline";
 import PullToRefresh from "@/components/shared/PullToRefresh";
+import SocialProof from "@/components/shared/SocialProof";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -78,6 +79,7 @@ export default async function HomePage() {
   return (
     <PullToRefresh>
       <HeroSection totalArticles={totalArticles} todayArticles={todayArticles} />
+      <SocialProof subscribers={1200} articles={totalArticles} satisfaction={98} />
       <HomeClient
         initialTrending={trending.map((a) => ({
           ...a,

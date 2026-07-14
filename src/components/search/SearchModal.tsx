@@ -1,6 +1,30 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Search, X } from "lucide-react";
+import { Search, X, Clock } from "lucide-react";
+
+const POPULAR_TERMS = ["React 19", "AI 에이전트", "Next.js", "TypeScript", "Python", "GraphQL", "Kubernetes"];
+
+function useRecentSearches() {
+  const [searches, setSearches] = useState<string[]>([]);
+  useEffect(() => {
+    try { const s = localStorage.getItem("devpulse_recent_searches"); if (s) setSearches(JSON.parse(s)); } catch {}
+  }, []);
+
+  const addSearch = useCallback((term: string) => {
+    setSearches(prev => {
+      const next = [term, ...prev.filter(s => s !== term)].slice(0, 8);
+      try { localStorage.setItem("devpulse_recent_searches", JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, []);
+
+  const clear = useCallback(() => {
+    setSearches([]);
+    try { localStorage.removeItem("devpulse_recent_searches"); } catch {}
+  }, []);
+
+  return { searches, addSearch, clear };
+}
 
 export default function SearchModal() {
   const [open, setOpen] = useState(false);
@@ -10,6 +34,7 @@ export default function SearchModal() {
   const [activeIndex, setActiveIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const { searches, addSearch, clear: clearHistory } = useRecentSearches();
 
   const close = useCallback(() => setOpen(false), []);
 
@@ -38,12 +63,13 @@ export default function SearchModal() {
       if (e.key === "ArrowDown") { e.preventDefault(); setActiveIndex((i) => Math.min(i + 1, results.length - 1)); }
       if (e.key === "ArrowUp") { e.preventDefault(); setActiveIndex((i) => Math.max(i - 1, 0)); }
       if (e.key === "Enter" && activeIndex >= 0 && results[activeIndex]) {
+        addSearch(query);
         window.location.href = `/article/${results[activeIndex].id}`;
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [open, results, activeIndex]);
+  }, [open, results, activeIndex, query, addSearch]);
 
   useEffect(() => {
     if (!query.trim()) { setResults([]); setLoading(false); return; }
@@ -84,16 +110,56 @@ export default function SearchModal() {
             <X size={20} className="text-text-muted" />
           </button>
         </div>
+
+        {!query.trim() && searches.length > 0 && (
+          <div className="mt-4">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium text-text-muted">최근 검색</p>
+              <button onClick={clearHistory} className="text-[10px] text-text-muted hover:text-text-primary">전체 삭제</button>
+            </div>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {searches.map(term => (
+                <button
+                  key={term}
+                  onClick={() => { setQuery(term); addSearch(term); }}
+                  className="flex items-center gap-1 rounded-lg border border-border bg-bg px-2.5 py-1.5 text-xs text-text-muted hover:text-text-primary"
+                >
+                  <Clock size={10} />
+                  {term}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!query.trim() && searches.length === 0 && (
+          <div className="mt-4">
+            <p className="text-xs font-medium text-text-muted">인기 검색어</p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {POPULAR_TERMS.map(term => (
+                <button
+                  key={term}
+                  onClick={() => setQuery(term)}
+                  className="rounded-lg border border-border bg-bg px-2.5 py-1.5 text-xs text-text-muted hover:text-emerald-400"
+                >
+                  {term}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {query.trim() && loading && (
           <div className="mt-4 flex justify-center py-4">
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-border border-t-emerald-400" />
           </div>
         )}
+
         {results.length > 0 && (
           <ul role="listbox" aria-label="검색 결과" className="mt-4 space-y-2">
             {results.map((r, i) => (
               <li key={r.id} role="option" aria-selected={i === activeIndex}>
-                <a href={`/article/${r.id}`} onClick={close}
+                <a href={`/article/${r.id}`} onClick={() => { addSearch(query); close(); }}
                   className={`block rounded-lg p-3 transition-colors ${
                     i === activeIndex ? "bg-emerald-950/50 text-emerald-400" : "hover:bg-border"
                   }`}>
@@ -104,6 +170,7 @@ export default function SearchModal() {
             ))}
           </ul>
         )}
+
         {query.trim() && !loading && results.length === 0 && (
           <p className="mt-4 text-center text-sm text-text-muted">검색 결과가 없습니다</p>
         )}

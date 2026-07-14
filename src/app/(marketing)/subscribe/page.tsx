@@ -147,6 +147,46 @@ export default function SubscribePage() {
         </div>
       </section>
 
+      <section className="mx-auto mt-16 grid max-w-3xl grid-cols-1 gap-6 sm:grid-cols-3">
+        {[
+          { value: "1,200+", label: "구독자" },
+          { value: "500+", label: "아티클" },
+          { value: "98%", label: "만족도" },
+        ].map(({ value, label }) => (
+          <div key={label} className="rounded-xl border border-border bg-card px-6 py-5 text-center">
+            <p className="text-2xl font-extrabold text-emerald-400">{value}</p>
+            <p className="mt-1 text-sm text-text-muted">{label}</p>
+          </div>
+        ))}
+      </section>
+
+      <section className="mx-auto mt-16 max-w-3xl">
+        <h2 className="mb-6 text-center text-lg font-bold text-text-primary">개발자들의 목소리</h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {[
+            { quote: "매주 화요일마다 꼭 확인합니다", name: "김개발", role: "시니어 엔지니어" },
+            { quote: "AI가 선별해주는 덕분에 시간을 절약합니다", name: "박프론트", role: "프론트엔드 개발자" },
+            { quote: "최신 트렌드를 놓치지 않을 수 있어 좋습니다", name: "이백엔드", role: "백엔드 개발자" },
+          ].map(({ quote, name, role }) => (
+            <div key={name} className="rounded-xl border border-border bg-card p-5">
+              <p className="text-sm text-text-secondary">"{quote}"</p>
+              <div className="mt-4 flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400" />
+                <div>
+                  <p className="text-xs font-medium text-text-primary">{name}</p>
+                  <p className="text-[11px] text-text-muted">{role}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto mt-16 max-w-xl rounded-xl border border-border bg-card px-6 py-5 text-center">
+        <p className="text-sm font-medium text-text-primary">🛡️ 언제든 구독 취소 가능</p>
+        <p className="mt-1 text-xs text-text-muted">약정 없음 · 신용카드 불필요 · 완전 무료</p>
+      </section>
+
       <section className="mx-auto mt-16 max-w-xl">
         <h2 className="mb-6 text-center text-lg font-bold text-text-primary">자주 묻는 질문</h2>
         <div className="space-y-2">
