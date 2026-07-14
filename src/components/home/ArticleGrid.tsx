@@ -114,9 +114,7 @@ export default function ArticleGrid({ articles, loading, onLoadMore, hasMore }: 
                 {JSON.parse(article.tags || "[]")
                   .slice(0, 3)
                   .map((tag: string) => (
-                    <span key={tag} className="rounded-full bg-slate-700/50 px-2 py-0.5 text-[10px] text-text-muted">
-                      {tag}
-                    </span>
+                    <Badge key={tag} variant="cyan" size="sm">{tag}</Badge>
                   ))}
               </div>
 

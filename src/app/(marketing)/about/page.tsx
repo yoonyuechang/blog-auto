@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Zap, Brain, Rss, BarChart3, Users, Github } from "lucide-react";
+import Accordion from "@/components/shared/Accordion";
 
 const SITE_URL = "https://blog-auto-woad.vercel.app";
 
@@ -124,6 +125,31 @@ export default function AboutPage() {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* FAQ */}
+        <div className="mt-16">
+          <h2 className="mb-6 text-center text-xl font-bold text-text-primary">자주 묻는 질문</h2>
+          <Accordion
+            items={[
+              {
+                title: "DevPulse는 어떤 서비스인가요?",
+                content: "DevPulse는 전 세계 기술 뉴스를 실시간으로 수집하고, AI가 핵심 내용을 분석·요약하여 개발자에게 전달하는 IT 트렌드 블로그입니다.",
+              },
+              {
+                title: "아티클은 얼마나 자주 업데이트되나요?",
+                content: "AI 큐레이션이 실시간으로 작동하여, 새로운 기술 아티클이 수집되는 즉시 분석 및 요약 과정을 거쳐 업데이트됩니다.",
+              },
+              {
+                title: "API를 사용할 수 있나요?",
+                content: "네, RESTful API를 통해 아티클 목록 조회, 검색, 통계, 뉴스레터 구독 등의 기능을 프로그래밍 방식으로 이용할 수 있습니다. 자세한 내용은 docs 페이지를 참고하세요.",
+              },
+              {
+                title: "뉴스레터는 어떻게 구독하나요?",
+                content: "뉴스레터 구독 페이지에서 이메일 주소를 입력하면 됩니다.感兴趣的 카테고리를 선택하여 맞춤형 뉴스레터를 받아볼 수 있습니다.",
+              },
+            ]}
+          />
         </div>
 
         {/* Contact / Links */}

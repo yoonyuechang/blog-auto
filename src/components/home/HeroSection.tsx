@@ -6,6 +6,8 @@ import AnimatedSection from "@/components/shared/AnimatedSection";
 import Button from "@/components/shared/Button";
 import GradientBorder from "@/components/shared/GradientBorder";
 import TypewriterText from "@/components/shared/TypewriterText";
+import { useLanguage } from "@/lib/language-context";
+import { t } from "@/lib/i18n";
 
 interface HeroSectionProps {
   totalArticles: number;
@@ -20,6 +22,7 @@ export default function HeroSection({
   todayArticles,
   trendingTags = DEFAULT_TAGS,
 }: HeroSectionProps) {
+  const { lang } = useLanguage()
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -78,7 +81,7 @@ export default function HeroSection({
       <AnimatedSection delay={0}>
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-1.5 text-xs font-medium text-text-secondary backdrop-blur-sm">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
-          매일 자동 수집 · AI 요약
+          {t('hero.badge', lang)}
         </div>
       </AnimatedSection>
 
@@ -89,16 +92,19 @@ export default function HeroSection({
           </span>
           <br />
           <span className="mt-2 block text-text-primary">
-            매일 AI가 요약하는
-            <br className="hidden md:block" />
-            IT 트렌드
+            {t('hero.mainTitle', lang).split('\n').map((line, i) => (
+              <span key={i}>
+                {line}
+                {i === 0 && <br className="hidden md:block" />}
+              </span>
+            ))}
           </span>
         </h1>
       </AnimatedSection>
 
       <AnimatedSection delay={200}>
         <p className="mx-auto mt-5 max-w-xl text-base text-text-secondary md:text-lg">
-          <TypewriterText text="주니어 개발자를 위한 기술 펄스 — 하루 5분, 오늘의 기술 트렌드를 한눈에" speed={30} />
+          <TypewriterText text={t('hero.description', lang)} speed={30} />
         </p>
       </AnimatedSection>
 
@@ -106,15 +112,15 @@ export default function HeroSection({
         <div className="mx-auto mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-text-muted md:gap-10">
           <div className="animate-fade-in-up stagger-stat flex items-center gap-2">
             <Newspaper size={18} className="text-emerald-400" />
-            <span>총 <strong className="text-text-primary">{displayTotal.toLocaleString()}</strong>개 글</span>
+            <span>총 <strong className="text-text-primary">{displayTotal.toLocaleString()}</strong>{t('hero.totalPosts', lang)}</span>
           </div>
           <div className="animate-fade-in-up stagger-stat flex items-center gap-2">
             <FolderOpen size={18} className="text-cyan-400" />
-            <span><strong className="text-text-primary">6</strong>개 카테고리</span>
+            <span><strong className="text-text-primary">6</strong>{t('hero.categories', lang)}</span>
           </div>
           <div className="animate-fade-in-up stagger-stat flex items-center gap-2">
             <RefreshCw size={18} className="text-emerald-400" />
-            <span><strong className="text-emerald-400">{displayToday.toLocaleString()}</strong>개 오늘 수집</span>
+            <span><strong className="text-emerald-400">{displayToday.toLocaleString()}</strong>{t('hero.todayCollected', lang)}</span>
           </div>
         </div>
       </AnimatedSection>
@@ -137,7 +143,7 @@ export default function HeroSection({
       <AnimatedSection delay={500}>
         <div className="mx-auto mt-8 flex flex-col items-center gap-3">
           <p className="text-sm text-text-muted">
-            이미 <strong className="text-text-primary">1,000+</strong> 개발자가 구독하고 있습니다
+            이미 <strong className="text-text-primary">1,000+</strong> {t('hero.subscribers', lang)}
           </p>
           <div className="flex -space-x-2">
             {[0,1,2,3].map((i) => (
@@ -154,35 +160,35 @@ export default function HeroSection({
           <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-text-muted">
             <span className="flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              매주 화요일 배포
+              {t('hero.delivered', lang)}
             </span>
             <span className="flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
-              AI 큐레이션
+              {t('hero.aiCurated', lang)}
             </span>
             <span className="flex items-center gap-1">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              무료
+              {t('hero.free', lang)}
             </span>
           </div>
         </div>
       </AnimatedSection>
 
       <AnimatedSection delay={600}>
-        <form onSubmit={handleSubscribe} aria-label="뉴스레터 구독" className="mx-auto mt-8 flex max-w-md gap-2">
-          <label htmlFor="hero-email" className="sr-only">이메일 주소</label>
+        <form onSubmit={handleSubscribe} aria-label={t('newsletter.title', lang)} className="mx-auto mt-8 flex max-w-md gap-2">
+          <label htmlFor="hero-email" className="sr-only">{t('newsletter.emailLabel', lang)}</label>
           <input
             id="hero-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="이메일을 입력하세요"
+            placeholder={t('newsletter.placeholder', lang)}
             className="flex-1 rounded-lg border border-border bg-card/60 px-4 py-3 text-sm text-text-primary placeholder-text-muted backdrop-blur-sm focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400/50"
             required
           />
           <GradientBorder>
             <Button type="submit" disabled={subscribed || loading} size="lg">
-              {subscribed ? "구독 완료!" : loading ? "구독 중..." : "구독하기"}
+              {subscribed ? t('newsletter.subscribed', lang) : loading ? t('newsletter.subscribing', lang) : t('newsletter.submit', lang)}
             </Button>
           </GradientBorder>
         </form>

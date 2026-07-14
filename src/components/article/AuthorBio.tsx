@@ -1,13 +1,11 @@
 import { Github, Twitter } from "lucide-react";
+import Avatar from "@/components/shared/Avatar";
 
 export default function AuthorBio() {
   return (
     <div className="mt-10 rounded-xl border border-border bg-card p-6">
       <div className="flex items-start gap-4">
-        {/* Avatar */}
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 text-lg font-bold text-white">
-          DP
-        </div>
+        <Avatar name="DevPulse 팀" size="lg" />
 
         <div className="flex-1">
           <h3 className="text-base font-bold text-text-primary">DevPulse 팀</h3>

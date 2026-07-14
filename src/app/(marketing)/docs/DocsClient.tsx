@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { ChevronRight, Copy, Check, ExternalLink } from "lucide-react";
+import { useState } from "react";
+import { Copy, Check, ExternalLink } from "lucide-react";
+import Accordion from "@/components/shared/Accordion";
 
 interface EndpointParam {
   name: string;
@@ -279,28 +280,12 @@ function CodeBlock({ children, label }: { children: string; label: string }) {
   );
 }
 
-function CollapsibleSection({ section, isOpen, toggle }: {
+function CollapsibleSection({ section }: {
   section: { id: string; title: string; content: SectionContent };
-  isOpen: boolean;
-  toggle: () => void;
 }) {
   return (
-    <div className="border-b border-border/50 last:border-b-0">
-      <button
-        onClick={toggle}
-        className="flex w-full items-center justify-between py-3 text-left"
-      >
-        <span className={`text-sm font-semibold transition-colors ${isOpen ? "text-emerald-400" : "text-text-primary"}`}>
-          {section.title}
-        </span>
-        <ChevronRight
-          size={14}
-          className={`text-text-muted transition-transform ${isOpen ? "rotate-90 text-emerald-400" : ""}`}
-        />
-      </button>
-
-      {isOpen && (
-        <div className="pb-4 text-sm text-text-secondary leading-relaxed">
+    <div>
+          <div className="pb-4 text-sm text-text-secondary leading-relaxed">
           <p>{section.content.description}</p>
 
           {section.content.note && (
@@ -365,30 +350,23 @@ function CollapsibleSection({ section, isOpen, toggle }: {
             <CodeBlock label="Response">{section.content.example}</CodeBlock>
           )}
         </div>
-      )}
     </div>
   );
 }
 
 export default function DocsClient({ children }: { children: React.ReactNode }) {
-  const [openSections, setOpenSections] = useState<Set<string>>(new Set(["overview"]));
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const toggleSection = useCallback((id: string) => {
-    setOpenSections((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
-
   const scrollTo = (id: string) => {
-    toggleSection(id);
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
     setSidebarOpen(false);
   };
+
+  const accordionItems = SECTIONS.map((s) => ({
+    title: s.title,
+    content: <CollapsibleSection section={s} />,
+  }));
 
   return (
     <div className="relative mx-auto max-w-6xl px-4 py-12">
@@ -408,11 +386,7 @@ export default function DocsClient({ children }: { children: React.ReactNode }) 
               <button
                 key={s.id}
                 onClick={() => scrollTo(s.id)}
-                className={`block w-full rounded-md px-3 py-1.5 text-left text-xs transition-colors ${
-                  openSections.has(s.id)
-                    ? "bg-emerald-500/10 font-medium text-emerald-400"
-                    : "text-text-muted hover:bg-card hover:text-text-secondary"
-                }`}
+                className="block w-full rounded-md px-3 py-1.5 text-left text-xs transition-colors text-text-muted hover:bg-card hover:text-text-secondary"
               >
                 {s.title}
               </button>
@@ -435,15 +409,7 @@ export default function DocsClient({ children }: { children: React.ReactNode }) 
 
         {/* Main content */}
         <div className="min-w-0 flex-1">
-          {SECTIONS.map((s) => (
-            <div key={s.id} id={s.id} className="scroll-mt-20">
-              <CollapsibleSection
-                section={s}
-                isOpen={openSections.has(s.id)}
-                toggle={() => toggleSection(s.id)}
-              />
-            </div>
-          ))}
+          <Accordion items={accordionItems} allowMultiple defaultOpen={[0]} />
 
           {/* Mobile API tester */}
           <div className="mt-8 lg:hidden">

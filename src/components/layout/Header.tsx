@@ -4,17 +4,12 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { Search, Menu, X, ChevronDown, Zap, Clock, TrendingUp, Tag, Info } from "lucide-react";
 import GradientText from "@/components/shared/GradientText";
-
-const CATEGORIES = [
-  { href: "/category/ai", label: "인공지능" },
-  { href: "/category/web", label: "웹개발" },
-  { href: "/category/opensource", label: "오픈소스" },
-  { href: "/category/research", label: "논문/리서치" },
-  { href: "/category/career", label: "커리어" },
-  { href: "/category/other", label: "기타" },
-];
+import LanguageToggle from "@/components/shared/LanguageToggle";
+import { useLanguage } from "@/lib/language-context";
+import { t } from "@/lib/i18n";
 
 export default function Header() {
+  const { lang } = useLanguage()
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [quickOpen, setQuickOpen] = useState(false);
@@ -40,6 +35,15 @@ export default function Header() {
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
 
+  const CATEGORIES = [
+    { href: "/category/ai", label: t('categories.aiFull', lang) },
+    { href: "/category/web", label: t('categories.webFull', lang) },
+    { href: "/category/opensource", label: t('categories.opensource', lang) },
+    { href: "/category/research", label: t('categories.research', lang) },
+    { href: "/category/career", label: t('categories.career', lang) },
+    { href: "/category/other", label: t('categories.other', lang) },
+  ];
+
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-bg/70 backdrop-blur-xl supports-[backdrop-filter]:bg-bg/50" style={{ paddingTop: "env(safe-area-inset-top)" }}>
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
@@ -58,19 +62,19 @@ export default function Header() {
             <div className="absolute left-0 top-full mt-2 w-52 overflow-hidden rounded-xl border border-border bg-card shadow-2xl shadow-black/40">
               <Link href="/?sort=recent" onClick={() => setQuickOpen(false)}
                 className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-border/50 hover:text-text-primary">
-                <Clock size={14} className="text-emerald-400" /> 최근 아티클
+                <Clock size={14} className="text-emerald-400" /> {t('nav.home', lang)}
               </Link>
               <Link href="/?sort=popular" onClick={() => setQuickOpen(false)}
                 className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-border/50 hover:text-text-primary">
-                <TrendingUp size={14} className="text-emerald-400" /> 인기 아티클
+                <TrendingUp size={14} className="text-emerald-400" /> {t('nav.categories', lang)}
               </Link>
               <Link href="/tags" onClick={() => setQuickOpen(false)}
                 className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-border/50 hover:text-text-primary">
-                <Tag size={14} className="text-emerald-400" /> 태그 목록
+                <Tag size={14} className="text-emerald-400" /> {t('nav.tags', lang)}
               </Link>
               <Link href="/about" onClick={() => setQuickOpen(false)}
                 className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-border/50 hover:text-text-primary">
-                <Info size={14} className="text-emerald-400" /> 소개
+                <Info size={14} className="text-emerald-400" /> {t('nav.about', lang)}
               </Link>
             </div>
           )}
@@ -82,7 +86,7 @@ export default function Header() {
             href="/"
             className="rounded-md px-3 py-1.5 text-sm text-text-muted transition-colors hover:bg-card hover:text-text-primary"
           >
-            홈
+            {t('nav.home', lang)}
           </Link>
 
           {/* Category dropdown */}
@@ -93,7 +97,7 @@ export default function Header() {
               aria-haspopup="true"
               className="flex items-center gap-1 rounded-md px-3 py-1.5 text-sm text-text-muted transition-colors hover:bg-card hover:text-text-primary"
             >
-              카테고리
+              {t('nav.categories', lang)}
               <ChevronDown size={14} className={`transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
             </button>
             {dropdownOpen && (
@@ -116,32 +120,32 @@ export default function Header() {
             href="/tags"
             className="rounded-md px-3 py-1.5 text-sm text-text-muted transition-colors hover:bg-card hover:text-text-primary"
           >
-            태그
+            {t('nav.tags', lang)}
           </Link>
 
           <Link
             href="/about"
             className="rounded-md px-3 py-1.5 text-sm text-text-muted transition-colors hover:bg-card hover:text-text-primary"
           >
-            소개
+            {t('nav.about', lang)}
           </Link>
 
           <Link
             href="/docs"
             className="rounded-md px-3 py-1.5 text-sm text-text-muted transition-colors hover:bg-card hover:text-text-primary"
           >
-            문서
+            {t('nav.docs', lang)}
           </Link>
 
           <Link
             href="/subscribe"
             className="rounded-md px-3 py-1.5 text-sm text-text-muted transition-colors hover:bg-card hover:text-text-primary"
           >
-            구독
+            {t('nav.newsletter', lang)}
           </Link>
         </nav>
 
-        {/* Search + mobile toggle */}
+        {/* Search + Language Toggle + mobile toggle */}
         <div className="flex items-center gap-2">
           <Link
             href="/search"
@@ -151,9 +155,11 @@ export default function Header() {
               <Search size={14} />
               <span className="absolute -right-0.5 -top-0.5 h-[3px] w-[3px] rounded-full bg-emerald-400 animate-pulse" />
             </span>
-            <span>검색</span>
+            <span>{t('nav.search', lang)}</span>
             <kbd className="ml-1 rounded border border-border bg-bg px-1.5 py-0.5 font-mono text-[10px] text-text-muted">⌘K</kbd>
           </Link>
+
+          <LanguageToggle />
 
           <button
             className="rounded-md p-2 text-text-muted transition-colors hover:text-text-primary md:hidden"
@@ -175,12 +181,12 @@ export default function Header() {
                 onClick={() => setMobileOpen(false)}
                 className="rounded-lg px-4 py-3 text-sm font-medium text-text-primary hover:bg-card"
               >
-                홈
+                {t('nav.home', lang)}
               </Link>
 
               <div className="mt-2">
                 <p className="px-4 pb-1 pt-2 text-xs font-semibold uppercase tracking-wider text-text-muted">
-                  카테고리
+                  {t('nav.categories', lang)}
                 </p>
                 {CATEGORIES.map((cat) => (
                   <Link
@@ -200,28 +206,28 @@ export default function Header() {
                   onClick={() => setMobileOpen(false)}
                   className="block rounded-lg px-4 py-3 text-sm font-medium text-text-primary hover:bg-card"
                 >
-                  태그
+                  {t('nav.tags', lang)}
                 </Link>
                 <Link
                   href="/about"
                   onClick={() => setMobileOpen(false)}
                   className="block rounded-lg px-4 py-3 text-sm font-medium text-text-primary hover:bg-card"
                 >
-                  소개
+                  {t('nav.about', lang)}
                 </Link>
                 <Link
                   href="/docs"
                   onClick={() => setMobileOpen(false)}
                   className="block rounded-lg px-4 py-3 text-sm font-medium text-text-primary hover:bg-card"
                 >
-                  문서
+                  {t('nav.docs', lang)}
                 </Link>
                 <Link
                   href="/subscribe"
                   onClick={() => setMobileOpen(false)}
                   className="block rounded-lg px-4 py-3 text-sm font-medium text-text-primary hover:bg-card"
                 >
-                  구독
+                  {t('nav.newsletter', lang)}
                 </Link>
                 <Link
                   href="/search"
@@ -229,7 +235,7 @@ export default function Header() {
                   className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-sm text-text-secondary hover:bg-card hover:text-text-primary"
                 >
                   <Search size={16} />
-                  검색
+                  {t('nav.search', lang)}
                   <kbd className="ml-auto rounded border border-border bg-bg px-1.5 py-0.5 font-mono text-[10px] text-text-muted">⌘K</kbd>
                 </Link>
               </div>
