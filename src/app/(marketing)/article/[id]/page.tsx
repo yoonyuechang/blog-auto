@@ -6,6 +6,7 @@ import DateFormatter from "@/components/shared/DateFormatter";
 import AISummary from "@/components/article/AISummary";
 import MarkdownBody from "@/components/article/MarkdownBody";
 import RelatedArticles from "@/components/article/RelatedArticles";
+import RecommendationSidebar from "@/components/shared/RecommendationSidebar";
 import ReadingProgress from "@/components/article/ReadingProgress";
 import ArticleFeedback from "@/components/feedback/ArticleFeedback";
 import TableOfContents from "@/components/article/TableOfContents";
@@ -16,6 +17,7 @@ import AdSense from "@/components/shared/AdSense";
 import AuthorBio from "@/components/article/AuthorBio";
 import ViewCounter from "@/components/article/ViewCounter";
 import ArticleNav from "@/components/article/ArticleNav";
+import ArticleHistoryTracker from "@/components/article/ArticleHistoryTracker";
 import Link from "next/link";
 import {
   generateBreadcrumbSchema,
@@ -160,7 +162,8 @@ export default async function ArticlePage({ params }: PageProps) {
           </div>
         </div>
 
-        <NewsletterInline />
+        <ArticleHistoryTracker articleId={article.id} title={article.title} category={article.category} />
+        <RecommendationSidebar articleId={article.id} />
 
         <RelatedArticles
           articleId={article.id}

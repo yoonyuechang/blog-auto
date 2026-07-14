@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Search, X, Clock } from "lucide-react";
+import { Search, X, Clock, BookOpen } from "lucide-react";
+import { getHistory, type HistoryItem } from "@/components/shared/ReadingHistory";
 
 const POPULAR_TERMS = ["React 19", "AI 에이전트", "Next.js", "TypeScript", "Python", "GraphQL", "Kubernetes"];
 
@@ -32,6 +33,7 @@ export default function SearchModal() {
   const [results, setResults] = useState<{ id: number; title: string; category: string }[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const { searches, addSearch, clear: clearHistory } = useRecentSearches();
@@ -51,6 +53,7 @@ export default function SearchModal() {
     if (open) {
       inputRef.current?.focus();
       document.body.style.overflow = "hidden";
+      setHistory(getHistory());
     } else {
       document.body.style.overflow = "";
     }
@@ -95,7 +98,7 @@ export default function SearchModal() {
       className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh]"
     >
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={close} />
-      <div className="relative w-full max-w-lg rounded-xl border border-border bg-card p-4 shadow-2xl">
+      <div className="relative w-full max-w-lg rounded-xl border border-border bg-card p-4 shadow-2xl max-h-[70vh] overflow-y-auto">
         <div className="flex items-center gap-3">
           <Search size={20} className="shrink-0 text-text-muted" aria-hidden="true" />
           <input
@@ -146,6 +149,29 @@ export default function SearchModal() {
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {!query.trim() && history.length > 0 && (
+          <div className="mt-4">
+            <p className="text-xs font-medium text-text-muted">최근 읽은 아티클</p>
+            <ul className="mt-2 space-y-1">
+              {history.slice(0, 5).map((item) => (
+                <li key={item.articleId}>
+                  <a
+                    href={`/article/${item.articleId}`}
+                    onClick={close}
+                    className="flex items-center gap-2 rounded-lg p-2 text-sm text-text-primary hover:bg-border transition-colors"
+                  >
+                    <BookOpen size={12} className="shrink-0 text-emerald-400" />
+                    <span className="line-clamp-1 flex-1">{item.title}</span>
+                    <span className="shrink-0 rounded bg-emerald-950/50 px-1.5 py-0.5 text-[10px] text-emerald-400">
+                      {item.category}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 
