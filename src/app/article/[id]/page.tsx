@@ -14,6 +14,7 @@ import NewsletterInline from "@/components/shared/NewsletterInline";
 import AdSense from "@/components/shared/AdSense";
 import AuthorBio from "@/components/article/AuthorBio";
 import ViewCounter from "@/components/article/ViewCounter";
+import ArticleNav from "@/components/article/ArticleNav";
 import Link from "next/link";
 import {
   generateBreadcrumbSchema,
@@ -66,15 +67,22 @@ export default async function ArticlePage({ params }: PageProps) {
   const article = await db.article.findUnique({ where: { id } });
   if (!article || article.status !== "approved") notFound();
 
-  const related = await db.article.findMany({
-    where: { category: article.category, status: "approved", id: { not: id } },
-    orderBy: { publishedAt: "desc" },
-    take: 3,
-  });
-
   const headings = extractHeadingsFromMarkdown(article.content);
   const faqs = extractFAQsFromContent(article.content);
   const description = extractMetaDescription(article.aiSummary);
+
+  const [prevArticle, nextArticle] = await Promise.all([
+    db.article.findFirst({
+      where: { status: "approved", publishedAt: { lt: article.publishedAt } },
+      orderBy: { publishedAt: "desc" },
+      select: { id: true, title: true },
+    }),
+    db.article.findFirst({
+      where: { status: "approved", publishedAt: { gt: article.publishedAt } },
+      orderBy: { publishedAt: "asc" },
+      select: { id: true, title: true },
+    }),
+  ]);
 
   const breadcrumbSchema = generateBreadcrumbSchema({
     id,
@@ -153,13 +161,11 @@ export default async function ArticlePage({ params }: PageProps) {
       <NewsletterInline />
 
       <RelatedArticles
-        articles={related.map((r) => ({
-          id: r.id,
-          title: r.title,
-          aiSummary: r.aiSummary,
-          difficultyLevel: r.difficultyLevel,
-        }))}
+        articleId={article.id}
+        tags={article.tags}
       />
+
+      <ArticleNav prev={prevArticle} next={nextArticle} />
 
       <AuthorBio />
     </article>

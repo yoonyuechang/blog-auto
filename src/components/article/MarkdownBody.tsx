@@ -75,16 +75,19 @@ const components: Components = {
     <ol className="mb-5 list-decimal space-y-1 pl-5 text-text-secondary marker:text-emerald-400/60">{children}</ol>
   ),
   li: ({ children }) => <li>{children}</li>,
-  a: ({ children, href }) => (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-emerald-400 underline decoration-emerald-400/30 underline-offset-2 hover:decoration-emerald-400 hover:text-emerald-300"
-    >
-      {children}
-    </a>
-  ),
+  a: ({ children, href }) => {
+    const isExternal = href?.startsWith("http");
+    return (
+      <a
+        href={href}
+        target={isExternal ? "_blank" : undefined}
+        rel={isExternal ? "noopener noreferrer" : undefined}
+        className="text-emerald-400 underline decoration-emerald-400/30 underline-offset-2 transition-colors hover:decoration-emerald-400 hover:text-emerald-300"
+      >
+        {children}
+      </a>
+    );
+  },
   strong: ({ children }) => (
     <strong className="font-semibold text-text-primary">{children}</strong>
   ),
@@ -123,7 +126,7 @@ const components: Components = {
       <img
         src={src}
         alt={alt || ""}
-        className="rounded-lg border border-border"
+        className="rounded-lg border border-border cursor-zoom-in"
         loading="lazy"
       />
       {alt && (

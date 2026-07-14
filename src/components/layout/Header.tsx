@@ -99,7 +99,10 @@ export default function Header() {
             aria-label="검색 열기 (Ctrl+K)"
             className="hidden items-center gap-2 rounded-lg border border-border bg-card/50 px-3 py-1.5 text-sm text-text-muted transition-colors hover:border-border hover:text-text-secondary md:flex"
           >
-            <Search size={14} />
+            <span className="relative">
+              <Search size={14} />
+              <span className="absolute -right-0.5 -top-0.5 h-[3px] w-[3px] rounded-full bg-emerald-400 animate-pulse" />
+            </span>
             <span>검색</span>
             <kbd className="ml-1 rounded border border-border bg-bg px-1.5 py-0.5 font-mono text-[10px] text-text-muted">⌘K</kbd>
           </button>

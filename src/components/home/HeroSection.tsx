@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Newspaper, FolderOpen, RefreshCw, Tag } from "lucide-react";
 import Button from "@/components/shared/Button";
 
@@ -20,6 +20,27 @@ export default function HeroSection({
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Animated counters
+  const [displayTotal, setDisplayTotal] = useState(0);
+  const [displayToday, setDisplayToday] = useState(0);
+  const counted = useRef(false);
+
+  useEffect(() => {
+    if (counted.current) return;
+    counted.current = true;
+    const start = performance.now();
+    const duration = 1500;
+    const animate = (now: number) => {
+      const elapsed = now - start;
+      const t = Math.min(elapsed / duration, 1);
+      const ease = 1 - Math.pow(1 - t, 3); // easeOutCubic
+      setDisplayTotal(Math.round(ease * totalArticles));
+      setDisplayToday(Math.round(ease * todayArticles));
+      if (t < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+  }, [totalArticles, todayArticles]);
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +95,7 @@ export default function HeroSection({
       <div className="mx-auto mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-text-muted md:gap-10">
         <div className="flex items-center gap-2">
           <Newspaper size={18} className="text-emerald-400" />
-          <span>총 <strong className="text-text-primary">{totalArticles.toLocaleString()}</strong>개 글</span>
+          <span>총 <strong className="text-text-primary">{displayTotal.toLocaleString()}</strong>개 글</span>
         </div>
         <div className="flex items-center gap-2">
           <FolderOpen size={18} className="text-cyan-400" />
@@ -82,7 +103,7 @@ export default function HeroSection({
         </div>
         <div className="flex items-center gap-2">
           <RefreshCw size={18} className="text-emerald-400" />
-          <span><strong className="text-emerald-400">{todayArticles}</strong>개 오늘 수집</span>
+          <span><strong className="text-emerald-400">{displayToday.toLocaleString()}</strong>개 오늘 수집</span>
         </div>
       </div>
 

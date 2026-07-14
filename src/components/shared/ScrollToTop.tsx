@@ -34,7 +34,7 @@ export default function ScrollToTop() {
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       aria-label="맨 위로"
-      className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg transition-opacity hover:bg-emerald-600"
+      className="fixed bottom-6 right-6 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg transition-opacity hover:bg-emerald-600"
     >
       <svg className="absolute inset-0 -rotate-90" width="48" height="48">
         <circle
@@ -43,13 +43,19 @@ export default function ScrollToTop() {
         />
         <circle
           cx="24" cy="24" r={RADIUS}
-          fill="none" stroke="white" strokeWidth="3"
+          fill="none" stroke="url(#emerald-cyan-gradient)" strokeWidth="3"
           strokeLinecap="round"
           strokeDasharray={CIRCUMFERENCE}
           strokeDashoffset={CIRCUMFERENCE * (1 - progress)}
           className="transition-[stroke-dashoffset] duration-150"
         />
       </svg>
+      <defs>
+        <linearGradient id="emerald-cyan-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#34D399" />
+          <stop offset="100%" stopColor="#22D3EE" />
+        </linearGradient>
+      </defs>
       <ArrowUp size={20} className="relative z-10" />
     </button>
   );

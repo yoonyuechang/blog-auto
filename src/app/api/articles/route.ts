@@ -12,11 +12,20 @@ export async function GET(req: NextRequest) {
     const difficulty = searchParams.get("difficulty");
     const q = searchParams.get("q");
 
+    const exclude = searchParams.get("exclude");
+    const tags = searchParams.get("tags");
+
     const where: Prisma.ArticleWhereInput = {};
     if (status) where.status = status;
     if (category) where.category = category;
     if (difficulty) where.difficultyLevel = difficulty;
-    if (q) {
+    if (exclude) where.id = { not: parseInt(exclude) };
+    if (tags) {
+      const tagList = tags.split(",").filter(Boolean);
+      if (tagList.length) {
+        where.OR = tagList.map((t) => ({ tags: { contains: t.trim() } }));
+      }
+    } else if (q) {
       where.OR = [
         { title: { contains: q } },
         { aiSummary: { contains: q } },

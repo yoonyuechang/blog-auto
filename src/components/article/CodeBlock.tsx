@@ -37,7 +37,7 @@ export default function CodeBlock({ children, className }: CodeBlockProps) {
         aria-label="코드 복사"
         className="absolute right-2 top-2 z-10 flex items-center gap-1 rounded border border-border bg-card px-2 py-1 text-xs text-text-muted opacity-0 transition-opacity hover:bg-border hover:text-text-primary group-hover/code:opacity-100"
       >
-        {copied ? <><Check size={12} /> 복사됨</> : <><Copy size={12} /> 복사</>}
+        {copied ? <><Check size={12} /> 복사됨!</> : <><Copy size={12} /> 복사</>}
       </button>
       <pre className="overflow-x-auto rounded-lg border border-border p-4 pr-20 text-sm" style={{ background: "#0d1117" }}>
         <code className={className}>
