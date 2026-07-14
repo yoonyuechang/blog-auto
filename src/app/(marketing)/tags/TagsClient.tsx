@@ -9,9 +9,12 @@ interface Tag {
   count: number;
 }
 
+const INITIAL_COUNT = 20;
+
 export default function TagsClient({ tags }: { tags: Tag[] }) {
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<"count" | "alpha">("count");
+  const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
 
   const filtered = useMemo(() => {
     let list = tags;
@@ -25,6 +28,9 @@ export default function TagsClient({ tags }: { tags: Tag[] }) {
     return list;
   }, [tags, query, sortKey]);
 
+  const visible = filtered.slice(0, visibleCount);
+  const hasMore = visibleCount < filtered.length;
+
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center gap-3">
@@ -33,7 +39,7 @@ export default function TagsClient({ tags }: { tags: Tag[] }) {
           <input
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => { setQuery(e.target.value); setVisibleCount(INITIAL_COUNT); }}
             placeholder="태그 검색..."
             className="w-full rounded-lg border border-border bg-card pl-9 pr-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-emerald-500 focus:outline-none"
           />
@@ -50,21 +56,33 @@ export default function TagsClient({ tags }: { tags: Tag[] }) {
       {filtered.length === 0 ? (
         <p className="py-20 text-center text-sm text-text-muted">일치하는 태그가 없습니다</p>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {filtered.map((tag) => (
-            <Link
-              key={tag.name}
-              href={`/search?q=${encodeURIComponent(tag.name)}`}
-              className="group flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 transition-all hover:border-emerald-500/40 hover:bg-emerald-500/5"
-            >
-              <Hash size={14} className="shrink-0 text-emerald-400 opacity-60 transition-opacity group-hover:opacity-100" />
-              <span className="truncate text-sm font-medium text-text-primary">{tag.name}</span>
-              <span className="ml-auto shrink-0 rounded-full bg-bg px-2 py-0.5 text-[10px] font-medium text-text-muted">
-                {tag.count}
-              </span>
-            </Link>
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {visible.map((tag) => (
+              <Link
+                key={tag.name}
+                href={`/search?q=${encodeURIComponent(tag.name)}`}
+                className="group flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 transition-all hover:border-emerald-500/40 hover:bg-emerald-500/5"
+              >
+                <Hash size={14} className="shrink-0 text-emerald-400 opacity-60 transition-opacity group-hover:opacity-100" />
+                <span className="truncate text-sm font-medium text-text-primary">{tag.name}</span>
+                <span className="ml-auto shrink-0 rounded-full bg-bg px-2 py-0.5 text-[10px] font-medium text-text-muted">
+                  {tag.count}
+                </span>
+              </Link>
+            ))}
+          </div>
+          {hasMore && (
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => setVisibleCount((c) => c + INITIAL_COUNT)}
+                className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-5 py-2.5 text-sm text-text-secondary transition-colors hover:text-text-primary"
+              >
+                더 보기 ({filtered.length - visibleCount}개 남음)
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       <p className="mt-8 text-center text-xs text-text-muted">

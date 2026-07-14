@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { Search, Menu, X, ChevronDown, Zap } from "lucide-react";
+import { Search, Menu, X, ChevronDown, Zap, Clock, TrendingUp, Tag, Info } from "lucide-react";
 import GradientText from "@/components/shared/GradientText";
 
 const CATEGORIES = [
@@ -17,13 +17,15 @@ const CATEGORIES = [
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [quickOpen, setQuickOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const quickRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const close = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setDropdownOpen(false);
-      }
+      const t = e.target as Node;
+      if (dropdownRef.current && !dropdownRef.current.contains(t)) setDropdownOpen(false);
+      if (quickRef.current && !quickRef.current.contains(t)) setQuickOpen(false);
     };
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
@@ -41,12 +43,38 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-bg/70 backdrop-blur-xl supports-[backdrop-filter]:bg-bg/50" style={{ paddingTop: "env(safe-area-inset-top)" }}>
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-1.5 text-lg font-bold tracking-tight text-text-primary">
-          <Zap size={18} className="text-emerald-400" />
-          <GradientText>DevPulse</GradientText>
-          <span className="ml-1 inline-block h-2 w-2 rounded-full bg-emerald-400 animate-pulse-dot" />
-        </Link>
+        {/* Logo + Quick Actions */}
+        <div ref={quickRef} className="relative">
+          <button
+            onClick={() => setQuickOpen(!quickOpen)}
+            className="flex items-center gap-1.5 text-lg font-bold tracking-tight text-text-primary"
+          >
+            <Zap size={18} className="text-emerald-400" />
+            <GradientText>DevPulse</GradientText>
+            <span className="ml-1 inline-block h-2 w-2 rounded-full bg-emerald-400 animate-pulse-dot" />
+            <ChevronDown size={14} className={`ml-0.5 text-text-muted transition-transform ${quickOpen ? "rotate-180" : ""}`} />
+          </button>
+          {quickOpen && (
+            <div className="absolute left-0 top-full mt-2 w-52 overflow-hidden rounded-xl border border-border bg-card shadow-2xl shadow-black/40">
+              <Link href="/?sort=recent" onClick={() => setQuickOpen(false)}
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-border/50 hover:text-text-primary">
+                <Clock size={14} className="text-emerald-400" /> 최근 아티클
+              </Link>
+              <Link href="/?sort=popular" onClick={() => setQuickOpen(false)}
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-border/50 hover:text-text-primary">
+                <TrendingUp size={14} className="text-emerald-400" /> 인기 아티클
+              </Link>
+              <Link href="/tags" onClick={() => setQuickOpen(false)}
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-border/50 hover:text-text-primary">
+                <Tag size={14} className="text-emerald-400" /> 태그 목록
+              </Link>
+              <Link href="/about" onClick={() => setQuickOpen(false)}
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-text-secondary transition-colors hover:bg-border/50 hover:text-text-primary">
+                <Info size={14} className="text-emerald-400" /> 소개
+              </Link>
+            </div>
+          )}
+        </div>
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-1 md:flex">

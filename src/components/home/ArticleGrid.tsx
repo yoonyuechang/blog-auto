@@ -1,11 +1,12 @@
 "use client";
 
+import { useCallback } from "react";
 import Card from "@/components/shared/Card";
 import GlowCard from "@/components/shared/GlowCard";
 import Badge from "@/components/shared/Badge";
 import Skeleton from "@/components/shared/Skeleton";
-import Button from "@/components/shared/Button";
 import DateFormatter from "@/components/shared/DateFormatter";
+import InfiniteScroll from "@/components/shared/InfiniteScroll";
 import { Eye, Clock } from "lucide-react";
 
 interface Article {
@@ -42,6 +43,8 @@ function estimateReadingTime(content?: string): string {
 }
 
 export default function ArticleGrid({ articles, loading, onLoadMore, hasMore }: ArticleGridProps) {
+  const stableLoadMore = useCallback(() => { onLoadMore?.(); }, [onLoadMore]);
+
   if (loading && articles.length === 0) {
     return (
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 px-4 py-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -74,58 +77,53 @@ export default function ArticleGrid({ articles, loading, onLoadMore, hasMore }: 
   return (
     <section className="mx-auto max-w-6xl px-4 py-8">
       <h2 className="mb-4 text-lg font-bold text-text-primary">최신 뉴스</h2>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {articles.map((article) => (
-          <GlowCard key={article.id} className="card-hover">
-            <Card href={`/article/${article.id}`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <span className={`h-2 w-2 rounded-full ${CATEGORY_DOT[article.category] || "bg-cyan-400"}`} />
-                <span className="text-xs text-text-muted">{article.category}</span>
+      <InfiniteScroll onLoadMore={stableLoadMore} hasMore={!!hasMore} loading={!!loading}>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {articles.map((article) => (
+            <GlowCard key={article.id} className="card-hover">
+              <Card href={`/article/${article.id}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <span className={`h-2 w-2 rounded-full ${CATEGORY_DOT[article.category] || "bg-cyan-400"}`} />
+                  <span className="text-xs text-text-muted">{article.category}</span>
+                </div>
+                <Badge level={article.difficultyLevel as "입문/초급" | "중급" | "고급"} />
               </div>
-              <Badge level={article.difficultyLevel as "입문/초급" | "중급" | "고급"} />
-            </div>
 
-            <h3 className="mt-3 mb-2 text-sm font-bold leading-tight text-text-primary line-clamp-2">
-              {article.title}
-            </h3>
+              <h3 className="mt-3 mb-2 text-sm font-bold leading-tight text-text-primary line-clamp-2">
+                {article.title}
+              </h3>
 
-            <p className="mb-3 text-xs leading-relaxed text-text-secondary line-clamp-2">
-              {article.aiSummary}
-            </p>
+              <p className="mb-3 text-xs leading-relaxed text-text-secondary line-clamp-2">
+                {article.aiSummary}
+              </p>
 
-            <div className="flex flex-wrap gap-1">
-              {JSON.parse(article.tags || "[]")
-                .slice(0, 3)
-                .map((tag: string) => (
-                  <span key={tag} className="rounded-full bg-slate-700/50 px-2 py-0.5 text-[10px] text-text-muted">
-                    {tag}
-                  </span>
-                ))}
-            </div>
+              <div className="flex flex-wrap gap-1">
+                {JSON.parse(article.tags || "[]")
+                  .slice(0, 3)
+                  .map((tag: string) => (
+                    <span key={tag} className="rounded-full bg-slate-700/50 px-2 py-0.5 text-[10px] text-text-muted">
+                      {tag}
+                    </span>
+                  ))}
+              </div>
 
-            <div className="mt-3 flex items-center gap-3 text-[10px] text-text-muted">
-              <span className="flex items-center gap-1">
-                <Eye className="h-3 w-3" />
-                {article.viewCount ?? 0}
-              </span>
-              <span className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                {estimateReadingTime(article.content)}
-              </span>
-              <span><DateFormatter date={article.publishedAt} /></span>
-            </div>
-          </Card>
-          </GlowCard>
-        ))}
-      </div>
-      {hasMore && (
-        <div className="mt-6 text-center">
-          <Button variant="secondary" onClick={onLoadMore}>
-            더보기
-          </Button>
+              <div className="mt-3 flex items-center gap-3 text-[10px] text-text-muted">
+                <span className="flex items-center gap-1">
+                  <Eye className="h-3 w-3" />
+                  {article.viewCount ?? 0}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  {estimateReadingTime(article.content)}
+                </span>
+                <span><DateFormatter date={article.publishedAt} /></span>
+              </div>
+            </Card>
+            </GlowCard>
+          ))}
         </div>
-      )}
+      </InfiniteScroll>
     </section>
   );
 }

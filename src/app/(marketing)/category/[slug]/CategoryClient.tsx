@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { Clock, TrendingUp, FileX } from "lucide-react";
 import Card from "@/components/shared/Card";
 import Badge from "@/components/shared/Badge";
+import Pagination from "@/components/shared/Pagination";
 
 interface Article {
   id: number;
@@ -16,6 +17,7 @@ interface Article {
   viewCount: number;
 }
 
+const PAGE_SIZE = 12;
 const difficulties = ["전체", "입문/초급", "중급", "고급"];
 const sortOptions = [
   { key: "latest" as const, label: "최신순", icon: Clock },
@@ -31,6 +33,7 @@ export default function CategoryClient({
 }) {
   const [difficulty, setDifficulty] = useState("전체");
   const [sortKey, setSortKey] = useState<"latest" | "popular">("latest");
+  const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
     const list = difficulty === "전체" ? initialArticles : initialArticles.filter((a) => a.difficultyLevel === difficulty);
@@ -38,12 +41,15 @@ export default function CategoryClient({
     return list;
   }, [initialArticles, difficulty, sortKey]);
 
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
   return (
     <>
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <div className="flex gap-1.5">
           {difficulties.map((d) => (
-            <button key={d} onClick={() => setDifficulty(d)}
+            <button key={d} onClick={() => { setDifficulty(d); setPage(1); }}
               className={`rounded-lg px-3 py-1.5 text-sm transition-colors ${difficulty === d ? "bg-emerald-500 text-white" : "bg-card text-text-muted hover:text-text-primary"}`}>
               {d}
             </button>
@@ -52,7 +58,7 @@ export default function CategoryClient({
         <span className="h-4 w-px bg-border" />
         <div className="flex gap-1.5">
           {sortOptions.map(({ key, label, icon: Icon }) => (
-            <button key={key} onClick={() => setSortKey(key)}
+            <button key={key} onClick={() => { setSortKey(key); setPage(1); }}
               className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors ${sortKey === key ? "bg-card text-text-primary border border-border" : "text-text-muted hover:text-text-primary"}`}>
               <Icon size={14} />
               {label}
@@ -68,24 +74,27 @@ export default function CategoryClient({
           <p className="mt-1 text-sm text-text-muted">다른 난이도 필터를 시도해 보세요</p>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((article) => (
-            <Card key={article.id} href={`/article/${article.id}`} accentColor={categoryColor}>
-              <Badge level={article.difficultyLevel as "입문/초급" | "중급" | "고급"} />
-              <h3 className="mt-2 text-sm font-bold text-text-primary line-clamp-2">{article.title}</h3>
-              <p className="mt-1 text-xs text-text-secondary line-clamp-2">{article.aiSummary}</p>
-              <div className="mt-3 flex items-center justify-between text-[10px] text-text-muted">
-                <span>{article.publishedAt}</span>
-                {article.viewCount > 0 && (
-                  <span className="flex items-center gap-1">
-                    <TrendingUp size={10} />
-                    {article.viewCount.toLocaleString()}
-                  </span>
-                )}
-              </div>
-            </Card>
-          ))}
-        </div>
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {paged.map((article) => (
+              <Card key={article.id} href={`/article/${article.id}`} accentColor={categoryColor}>
+                <Badge level={article.difficultyLevel as "입문/초급" | "중급" | "고급"} />
+                <h3 className="mt-2 text-sm font-bold text-text-primary line-clamp-2">{article.title}</h3>
+                <p className="mt-1 text-xs text-text-secondary line-clamp-2">{article.aiSummary}</p>
+                <div className="mt-3 flex items-center justify-between text-[10px] text-text-muted">
+                  <span>{article.publishedAt}</span>
+                  {article.viewCount > 0 && (
+                    <span className="flex items-center gap-1">
+                      <TrendingUp size={10} />
+                      {article.viewCount.toLocaleString()}
+                    </span>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
+          <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+        </>
       )}
     </>
   );

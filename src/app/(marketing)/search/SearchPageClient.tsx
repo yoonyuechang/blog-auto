@@ -8,6 +8,7 @@ import GlowCard from "@/components/shared/GlowCard";
 import Badge from "@/components/shared/Badge";
 import Skeleton from "@/components/shared/Skeleton";
 import DateFormatter from "@/components/shared/DateFormatter";
+import InfiniteScroll from "@/components/shared/InfiniteScroll";
 
 interface Article {
   id: number;
@@ -175,11 +176,11 @@ export default function SearchPageClient() {
     fetchResults(query, selectedCategories, s, 1);
   };
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     const next = page + 1;
     setPage(next);
     fetchResults(query, selectedCategories, sort, next, true);
-  };
+  }, [page, query, selectedCategories, sort, fetchResults]);
 
   useEffect(() => {
     if (selectedCategories.length > 0 || query) {
@@ -350,43 +351,32 @@ export default function SearchPageClient() {
       )}
 
       {!loading && articles.length > 0 && (
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {articles.map(article => (
-            <GlowCard key={article.id}>
-              <Card href={`/article/${article.id}`}>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-text-muted">{article.category}</span>
-                  <Badge level={article.difficultyLevel as "입문/초급" | "중급" | "고급"} />
-                </div>
-                <h3 className="mt-3 mb-2 text-sm font-bold leading-tight text-text-primary line-clamp-2">{article.title}</h3>
-                <p className="mb-3 text-xs leading-relaxed text-text-secondary line-clamp-2">{article.aiSummary}</p>
-                <div className="flex flex-wrap gap-1">
-                  {JSON.parse(article.tags || "[]").slice(0, 3).map((tag: string) => (
-                    <span key={tag} className="rounded-full bg-slate-700/50 px-2 py-0.5 text-[10px] text-text-muted">{tag}</span>
-                  ))}
-                </div>
-                <div className="mt-3 flex items-center gap-3 text-[10px] text-text-muted">
-                  <span className="flex items-center gap-1"><Eye size={10} />{article.viewCount ?? 0}</span>
-                  <span className="flex items-center gap-1"><Clock size={10} />{estimateReadingTime()}</span>
-                  <span><DateFormatter date={article.publishedAt} /></span>
-                </div>
-              </Card>
-            </GlowCard>
-          ))}
-        </div>
-      )}
-
-      {!loading && articles.length > 0 && hasMore && (
-        <div className="mt-6 text-center">
-          <button
-            onClick={handleLoadMore}
-            disabled={loading}
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-5 py-2.5 text-sm text-text-secondary transition-colors hover:text-text-primary disabled:opacity-50"
-          >
-            <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
-            더보기
-          </button>
-        </div>
+        <InfiniteScroll onLoadMore={handleLoadMore} hasMore={hasMore} loading={loading}>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {articles.map(article => (
+              <GlowCard key={article.id}>
+                <Card href={`/article/${article.id}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-text-muted">{article.category}</span>
+                    <Badge level={article.difficultyLevel as "입문/초급" | "중급" | "고급"} />
+                  </div>
+                  <h3 className="mt-3 mb-2 text-sm font-bold leading-tight text-text-primary line-clamp-2">{article.title}</h3>
+                  <p className="mb-3 text-xs leading-relaxed text-text-secondary line-clamp-2">{article.aiSummary}</p>
+                  <div className="flex flex-wrap gap-1">
+                    {JSON.parse(article.tags || "[]").slice(0, 3).map((tag: string) => (
+                      <span key={tag} className="rounded-full bg-slate-700/50 px-2 py-0.5 text-[10px] text-text-muted">{tag}</span>
+                    ))}
+                  </div>
+                  <div className="mt-3 flex items-center gap-3 text-[10px] text-text-muted">
+                    <span className="flex items-center gap-1"><Eye size={10} />{article.viewCount ?? 0}</span>
+                    <span className="flex items-center gap-1"><Clock size={10} />{estimateReadingTime()}</span>
+                    <span><DateFormatter date={article.publishedAt} /></span>
+                  </div>
+                </Card>
+              </GlowCard>
+            ))}
+          </div>
+        </InfiniteScroll>
       )}
 
       {(query || selectedCategories.length > 0) && !loading && articles.length === 0 && (

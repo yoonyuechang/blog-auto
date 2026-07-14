@@ -66,6 +66,31 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement).isContentEditable) return;
+
+      const ids = headings.map((h) => h.id);
+      if (!ids.length) return;
+
+      const currentIdx = ids.indexOf(activeId);
+
+      if (e.key === "j" || e.key === "J") {
+        e.preventDefault();
+        const next = currentIdx < ids.length - 1 ? currentIdx + 1 : 0;
+        scrollTo(ids[next]);
+      } else if (e.key === "k" || e.key === "K") {
+        e.preventDefault();
+        const prev = currentIdx > 0 ? currentIdx - 1 : ids.length - 1;
+        scrollTo(ids[prev]);
+      }
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [headings, activeId, scrollTo]);
+
   if (!headings.length) return null;
 
   const headingList = headings.map((h) => (
