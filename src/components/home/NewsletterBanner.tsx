@@ -24,7 +24,7 @@ export default function NewsletterBanner() {
 
   return (
     <div className="mx-auto my-8 max-w-6xl px-4">
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-500/10 via-cyan-500/10 to-emerald-500/10 px-8 py-10 text-center">
+      <div className="glass relative overflow-hidden rounded-2xl px-8 py-10 text-center gradient-mesh-emerald">
         <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-emerald-500/5 blur-3xl" />
         <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-cyan-500/5 blur-3xl" />
 

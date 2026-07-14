@@ -126,6 +126,78 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 :focus-visible {
   outline: 2px solid #34D399;
   outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.2);
+}
+
+/* Glass morphism utility */
+.glass {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Gradient mesh backgrounds */
+.gradient-mesh-emerald {
+  background:
+    radial-gradient(at 20% 80%, rgba(52, 211, 153, 0.08) 0%, transparent 50%),
+    radial-gradient(at 80% 20%, rgba(34, 211, 238, 0.06) 0%, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(30, 41, 59, 1) 0%, transparent 100%);
+}
+.gradient-mesh-cyan {
+  background:
+    radial-gradient(at 80% 80%, rgba(34, 211, 238, 0.08) 0%, transparent 50%),
+    radial-gradient(at 20% 20%, rgba(52, 211, 153, 0.06) 0%, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(30, 41, 59, 1) 0%, transparent 100%);
+}
+
+/* Tokyo Night inspired code blocks */
+pre {
+  background: #1a1b26 !important;
+  border-color: #2f3549;
+}
+pre .keyword { color: #bb9af7; }
+pre .string { color: #9ece6a; }
+pre .comment { color: #565f89; font-style: italic; }
+pre .function { color: #7aa2f7; }
+pre .number { color: #ff9e64; }
+pre .operator { color: #89ddff; }
+pre .type { color: #2ac3de; }
+
+/* Enhanced table styles */
+tbody tr:nth-child(even) { background: rgba(30, 41, 59, 0.3); }
+tbody tr { transition: background 0.15s ease; }
+tbody tr:hover { background: rgba(52, 211, 153, 0.05); }
+
+/* Enhanced blockquote */
+blockquote {
+  font-style: italic;
+  color: #94a3b8;
+}
+
+/* Gradient border utility */
+.gradient-border {
+  position: relative;
+  border: none !important;
+}
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--border-from, #34D399), var(--border-to, #22D3EE));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.gradient-border:hover::before {
+  opacity: 1;
+  background: linear-gradient(135deg, #34D399, #22D3EE, #34D399);
+  background-size: 200% 200%;
+  animation: gradient 3s ease infinite;
 }
 
 /* Pulse animation for logo */

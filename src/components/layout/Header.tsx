@@ -127,6 +127,13 @@ export default function Header() {
           </Link>
 
           <Link
+            href="/docs"
+            className="rounded-md px-3 py-1.5 text-sm text-text-muted transition-colors hover:bg-card hover:text-text-primary"
+          >
+            문서
+          </Link>
+
+          <Link
             href="/subscribe"
             className="rounded-md px-3 py-1.5 text-sm text-text-muted transition-colors hover:bg-card hover:text-text-primary"
           >
@@ -201,6 +208,13 @@ export default function Header() {
                   className="block rounded-lg px-4 py-3 text-sm font-medium text-text-primary hover:bg-card"
                 >
                   소개
+                </Link>
+                <Link
+                  href="/docs"
+                  onClick={() => setMobileOpen(false)}
+                  className="block rounded-lg px-4 py-3 text-sm font-medium text-text-primary hover:bg-card"
+                >
+                  문서
                 </Link>
                 <Link
                   href="/subscribe"

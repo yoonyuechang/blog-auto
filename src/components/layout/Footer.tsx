@@ -36,6 +36,7 @@ export default function Footer() {
               <li><Link href="/" className="transition-colors hover:text-emerald-400">홈</Link></li>
               <li><Link href="/tags" className="transition-colors hover:text-emerald-400">태그</Link></li>
               <li><Link href="/about" className="transition-colors hover:text-emerald-400">소개</Link></li>
+              <li><Link href="/docs" className="transition-colors hover:text-emerald-400">API 문서</Link></li>
               <li><Link href="/subscribe" className="transition-colors hover:text-emerald-400">구독</Link></li>
               <li><Link href="/admin" className="transition-colors hover:text-emerald-400">관리자</Link></li>
             </ul>

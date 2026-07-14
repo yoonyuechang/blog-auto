@@ -45,7 +45,7 @@ const DEFAULT_TITLES: Record<CalloutType, string> = {
 export default function Callout({ type, title, children }: CalloutProps) {
   const style = CALLOUT_STYLES[type];
   return (
-    <div className={`my-5 flex gap-3 rounded-lg border-l-4 ${style.border} ${style.bg} p-4`}>
+    <div className={`my-5 flex gap-3 rounded-lg border-l-4 ${style.border} ${style.bg} glass p-4`}>
       <div className="pt-0.5">{style.icon}</div>
       <div className="min-w-0 text-sm leading-relaxed text-text-secondary">
         <span className={`mb-1 block font-semibold ${style.titleColor}`}>

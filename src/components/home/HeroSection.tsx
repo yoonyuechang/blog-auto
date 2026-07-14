@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Newspaper, FolderOpen, RefreshCw, Tag } from "lucide-react";
 import Button from "@/components/shared/Button";
+import GradientBorder from "@/components/shared/GradientBorder";
 import TypewriterText from "@/components/shared/TypewriterText";
 
 interface HeroSectionProps {
@@ -172,9 +173,11 @@ export default function HeroSection({
           className="flex-1 rounded-lg border border-border bg-card/60 px-4 py-3 text-sm text-text-primary placeholder-text-muted backdrop-blur-sm focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400/50"
           required
         />
-        <Button type="submit" disabled={subscribed || loading} size="lg">
-          {subscribed ? "구독 완료!" : loading ? "구독 중..." : "구독하기"}
-        </Button>
+        <GradientBorder>
+          <Button type="submit" disabled={subscribed || loading} size="lg">
+            {subscribed ? "구독 완료!" : loading ? "구독 중..." : "구독하기"}
+          </Button>
+        </GradientBorder>
       </form>
     </section>
   );

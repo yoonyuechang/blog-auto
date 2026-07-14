@@ -168,7 +168,7 @@ export default function SubscribePage() {
             { quote: "AI가 선별해주는 덕분에 시간을 절약합니다", name: "박프론트", role: "프론트엔드 개발자" },
             { quote: "최신 트렌드를 놓치지 않을 수 있어 좋습니다", name: "이백엔드", role: "백엔드 개발자" },
           ].map(({ quote, name, role }) => (
-            <div key={name} className="rounded-xl border border-border bg-card p-5">
+            <div key={name} className="glass rounded-xl p-5">
               <p className="text-sm text-text-secondary">"{quote}"</p>
               <div className="mt-4 flex items-center gap-3">
                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400" />
