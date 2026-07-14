@@ -19,13 +19,37 @@ interface RelatedArticlesProps {
   tags: string;
 }
 
+function SkeletonCard() {
+  return (
+    <div className="rounded-xl border border-border bg-card p-4">
+      <div className="flex items-center justify-between">
+        <div className="h-5 w-16 animate-pulse rounded bg-surface" />
+        <div className="h-4 w-12 animate-pulse rounded bg-surface" />
+      </div>
+      <div className="mt-3 h-4 w-full animate-pulse rounded bg-surface" />
+      <div className="mt-2 h-3 w-3/4 animate-pulse rounded bg-surface" />
+      <div className="mt-3 flex gap-1">
+        <div className="h-4 w-12 animate-pulse rounded bg-surface" />
+        <div className="h-4 w-14 animate-pulse rounded bg-surface" />
+      </div>
+    </div>
+  );
+}
+
 export default function RelatedArticles({ articleId, tags }: RelatedArticlesProps) {
   const [articles, setArticles] = useState<RelatedArticle[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!tags) return;
+    if (!tags) {
+      setLoading(false);
+      return;
+    }
     const parsedTags = JSON.parse(tags || "[]") as string[];
-    if (!parsedTags.length) return;
+    if (!parsedTags.length) {
+      setLoading(false);
+      return;
+    }
 
     const params = new URLSearchParams({
       exclude: String(articleId),
@@ -37,8 +61,22 @@ export default function RelatedArticles({ articleId, tags }: RelatedArticlesProp
     fetch(`/api/articles?${params}`)
       .then((r) => r.json())
       .then((data) => setArticles(data.articles?.slice(0, 3) ?? []))
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [articleId, tags]);
+
+  if (loading) {
+    return (
+      <section className="mt-12 border-t border-border pt-8">
+        <h2 className="mb-4 text-lg font-bold text-text-primary">관련 글</h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   if (!articles.length) return null;
 

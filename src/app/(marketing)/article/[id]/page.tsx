@@ -65,111 +65,114 @@ export default async function ArticlePage({ params }: PageProps) {
   const id = parseInt(params.id);
   if (isNaN(id)) notFound();
 
-  const article = await db.article.findUnique({ where: { id } });
-  if (!article || article.status !== "approved") notFound();
+  try {
+    const article = await db.article.findUnique({ where: { id } });
+    if (!article || article.status !== "approved") notFound();
 
-  const headings = extractHeadingsFromMarkdown(article.content);
-  const faqs = extractFAQsFromContent(article.content);
-  const description = extractMetaDescription(article.aiSummary);
+    const headings = extractHeadingsFromMarkdown(article.content);
+    const faqs = extractFAQsFromContent(article.content);
 
-  const [prevArticle, nextArticle] = await Promise.all([
-    db.article.findFirst({
-      where: { status: "approved", publishedAt: { lt: article.publishedAt } },
-      orderBy: { publishedAt: "desc" },
-      select: { id: true, title: true },
-    }),
-    db.article.findFirst({
-      where: { status: "approved", publishedAt: { gt: article.publishedAt } },
-      orderBy: { publishedAt: "asc" },
-      select: { id: true, title: true },
-    }),
-  ]);
+    const [prevArticle, nextArticle] = await Promise.all([
+      db.article.findFirst({
+        where: { status: "approved", publishedAt: { lt: article.publishedAt } },
+        orderBy: { publishedAt: "desc" },
+        select: { id: true, title: true },
+      }),
+      db.article.findFirst({
+        where: { status: "approved", publishedAt: { gt: article.publishedAt } },
+        orderBy: { publishedAt: "asc" },
+        select: { id: true, title: true },
+      }),
+    ]);
 
-  const breadcrumbSchema = generateBreadcrumbSchema({
-    id,
-    title: article.title,
-    category: article.category,
-  });
-  const faqSchema = generateFAQSchema(faqs);
+    const breadcrumbSchema = generateBreadcrumbSchema({
+      id,
+      title: article.title,
+      category: article.category,
+    });
+    const faqSchema = generateFAQSchema(faqs);
 
-  const updatedDate = article.updatedAt.toISOString().split("T")[0];
+    const updatedDate = article.updatedAt.toISOString().split("T")[0];
 
-  return (
-    <article className="mx-auto max-w-3xl px-4 py-12">
-      <ReadingProgress />
+    return (
+      <article className="mx-auto max-w-3xl px-4 py-12">
+        <ReadingProgress />
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(breadcrumbSchema),
-        }}
-      />
-      {faqSchema && (
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(faqSchema),
+            __html: JSON.stringify(breadcrumbSchema),
           }}
         />
-      )}
+        {faqSchema && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(faqSchema),
+            }}
+          />
+        )}
 
-      <div className="mb-6 flex flex-wrap gap-2">
-        <Link href={`/category/${article.category}`} className="text-xs font-medium text-text-muted hover:text-emerald-400">
-          #{article.category}
-        </Link>
-        {article.tags && JSON.parse(article.tags || "[]").map((tag: string) => (
-          <Link key={tag} href={`/search?q=${encodeURIComponent(tag)}`} className="text-xs text-text-muted hover:text-emerald-400">
-            #{tag}
+        <div className="mb-6 flex flex-wrap gap-2">
+          <Link href={`/category/${article.category}`} className="text-xs font-medium text-text-muted hover:text-emerald-400">
+            #{article.category}
           </Link>
-        ))}
-      </div>
-
-      <ArticleHeader
-        title={article.title}
-        category={article.category}
-        source={article.source}
-        sourceUrl={article.sourceUrl}
-        difficultyLevel={article.difficultyLevel}
-        publishedAt={article.publishedAt.toISOString().split("T")[0]}
-        updatedAt={updatedDate}
-        viewCount={article.viewCount}
-        articleId={article.id}
-        content={article.content}
-      />
-
-      {headings.length > 2 && <TableOfContents headings={headings} />}
-
-      <AISummary aiSummary={article.aiSummary} keyPoints={article.keyPoints} />
-      <MarkdownBody content={article.content} />
-      <AdSense slot="0000000000" format="auto" />
-
-      <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
-        <ShareButtons
-          title={article.title}
-          url={`${SITE_URL}/article/${id}`}
-        />
-        <BookmarkButton articleId={article.id} />
-      </div>
-
-      <div className="mt-6 rounded-xl border border-border bg-card p-6">
-        <h3 className="mb-3 text-center text-base font-bold text-text-primary">
-          이 글이 도움이 되었나요?
-        </h3>
-        <div className="flex justify-center">
-          <ArticleFeedback articleId={article.id} />
+          {article.tags && JSON.parse(article.tags || "[]").map((tag: string) => (
+            <Link key={tag} href={`/search?q=${encodeURIComponent(tag)}`} className="text-xs text-text-muted hover:text-emerald-400">
+              #{tag}
+            </Link>
+          ))}
         </div>
-      </div>
 
-      <NewsletterInline />
+        <ArticleHeader
+          title={article.title}
+          category={article.category}
+          source={article.source}
+          sourceUrl={article.sourceUrl}
+          difficultyLevel={article.difficultyLevel}
+          publishedAt={article.publishedAt.toISOString().split("T")[0]}
+          updatedAt={updatedDate}
+          viewCount={article.viewCount}
+          articleId={article.id}
+          content={article.content}
+        />
 
-      <RelatedArticles
-        articleId={article.id}
-        tags={article.tags}
-      />
+        {headings.length > 2 && <TableOfContents headings={headings} />}
 
-      <ArticleNav prev={prevArticle} next={nextArticle} />
+        <AISummary aiSummary={article.aiSummary} keyPoints={article.keyPoints} />
+        <MarkdownBody content={article.content} />
+        <AdSense slot="0000000000" format="auto" />
 
-      <AuthorBio />
-    </article>
-  );
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-4">
+          <ShareButtons
+            title={article.title}
+            url={`${SITE_URL}/article/${id}`}
+          />
+          <BookmarkButton articleId={article.id} />
+        </div>
+
+        <div className="mt-6 rounded-xl border border-border bg-card p-6">
+          <h3 className="mb-3 text-center text-base font-bold text-text-primary">
+            이 글이 도움이 되었나요?
+          </h3>
+          <div className="flex justify-center">
+            <ArticleFeedback articleId={article.id} />
+          </div>
+        </div>
+
+        <NewsletterInline />
+
+        <RelatedArticles
+          articleId={article.id}
+          tags={article.tags}
+        />
+
+        <ArticleNav prev={prevArticle} next={nextArticle} />
+
+        <AuthorBio />
+      </article>
+    );
+  } catch {
+    notFound();
+  }
 }

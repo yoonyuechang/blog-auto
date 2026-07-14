@@ -3,6 +3,7 @@ import HeroSection from "@/components/home/HeroSection";
 import HomeClient from "./HomeClient";
 import NewsletterInline from "@/components/shared/NewsletterInline";
 import PullToRefresh from "@/components/shared/PullToRefresh";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -94,6 +95,22 @@ export default async function HomePage() {
         tagCounts={tagCounts}
       />
       <NewsletterInline />
+      <div className="mx-auto max-w-6xl px-4 pb-12">
+        <div className="flex items-center justify-center gap-4">
+          <Link
+            href="/tags"
+            className="rounded-lg border border-border bg-card px-5 py-2.5 text-sm text-text-secondary transition-colors hover:text-text-primary"
+          >
+            전체 태그 보기 →
+          </Link>
+          <Link
+            href="/about"
+            className="rounded-lg border border-border bg-card px-5 py-2.5 text-sm text-text-secondary transition-colors hover:text-text-primary"
+          >
+            DevPulse 소개 →
+          </Link>
+        </div>
+      </div>
     </PullToRefresh>
   );
 }

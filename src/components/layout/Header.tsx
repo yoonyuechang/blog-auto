@@ -85,6 +85,20 @@ export default function Header() {
           </div>
 
           <Link
+            href="/tags"
+            className="rounded-md px-3 py-1.5 text-sm text-text-muted transition-colors hover:bg-card hover:text-text-primary"
+          >
+            태그
+          </Link>
+
+          <Link
+            href="/about"
+            className="rounded-md px-3 py-1.5 text-sm text-text-muted transition-colors hover:bg-card hover:text-text-primary"
+          >
+            소개
+          </Link>
+
+          <Link
             href="/subscribe"
             className="rounded-md px-3 py-1.5 text-sm text-text-muted transition-colors hover:bg-card hover:text-text-primary"
           >
@@ -147,6 +161,20 @@ export default function Header() {
               </div>
 
               <div className="mt-4 border-t border-border pt-4">
+                <Link
+                  href="/tags"
+                  onClick={() => setMobileOpen(false)}
+                  className="block rounded-lg px-4 py-3 text-sm font-medium text-text-primary hover:bg-card"
+                >
+                  태그
+                </Link>
+                <Link
+                  href="/about"
+                  onClick={() => setMobileOpen(false)}
+                  className="block rounded-lg px-4 py-3 text-sm font-medium text-text-primary hover:bg-card"
+                >
+                  소개
+                </Link>
                 <Link
                   href="/subscribe"
                   onClick={() => setMobileOpen(false)}

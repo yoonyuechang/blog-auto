@@ -34,6 +34,8 @@ export default function Footer() {
             <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-text-secondary">바로가기</h4>
             <ul className="space-y-2 text-xs text-text-muted">
               <li><Link href="/" className="transition-colors hover:text-emerald-400">홈</Link></li>
+              <li><Link href="/tags" className="transition-colors hover:text-emerald-400">태그</Link></li>
+              <li><Link href="/about" className="transition-colors hover:text-emerald-400">소개</Link></li>
               <li><Link href="/subscribe" className="transition-colors hover:text-emerald-400">구독</Link></li>
               <li><Link href="/admin" className="transition-colors hover:text-emerald-400">관리자</Link></li>
             </ul>
