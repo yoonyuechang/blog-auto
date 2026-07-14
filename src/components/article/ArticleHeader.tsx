@@ -1,6 +1,7 @@
 import Badge from "@/components/shared/Badge";
 import ViewCounter from "@/components/article/ViewCounter";
-import { ExternalLink, Calendar, Clock, RotateCcw } from "lucide-react";
+import ReadingTime from "@/components/article/ReadingTime";
+import { ExternalLink, Calendar, RotateCcw } from "lucide-react";
 
 interface ArticleHeaderProps {
   title: string;
@@ -12,6 +13,7 @@ interface ArticleHeaderProps {
   updatedAt?: string;
   viewCount?: number;
   articleId?: number;
+  content?: string;
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -32,6 +34,7 @@ export default function ArticleHeader({
   updatedAt,
   viewCount,
   articleId,
+  content,
 }: ArticleHeaderProps) {
   const catColor = CATEGORY_COLORS[category] || "bg-cyan-950 text-cyan-400";
 
@@ -79,10 +82,7 @@ export default function ArticleHeader({
             수정: {updatedAt}
           </span>
         )}
-        <span className="flex items-center gap-1.5">
-          <Clock size={14} className="text-emerald-400" />
-          약 3분 읽기
-        </span>
+        {content && <ReadingTime content={content} />}
         <span>{source}</span>
         <a
           href={sourceUrl}

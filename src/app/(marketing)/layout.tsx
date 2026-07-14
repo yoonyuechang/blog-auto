@@ -6,13 +6,13 @@ import ScrollProgress from "@/components/shared/ScrollProgress";
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <div lang="ko">
       <ScrollProgress />
       <SearchModal />
       <Header />
       <main id="main-content" className="min-h-screen">{children}</main>
       <Footer />
       <ScrollToTop />
-    </>
+    </div>
   );
 }

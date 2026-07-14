@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import ArticleHeader from "@/components/article/ArticleHeader";
+import DateFormatter from "@/components/shared/DateFormatter";
 import AISummary from "@/components/article/AISummary";
 import MarkdownBody from "@/components/article/MarkdownBody";
 import RelatedArticles from "@/components/article/RelatedArticles";
@@ -133,6 +134,7 @@ export default async function ArticlePage({ params }: PageProps) {
         updatedAt={updatedDate}
         viewCount={article.viewCount}
         articleId={article.id}
+        content={article.content}
       />
 
       {headings.length > 2 && <TableOfContents headings={headings} />}

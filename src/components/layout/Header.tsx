@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Search, Menu, X, ChevronDown, Zap } from "lucide-react";
+import GradientText from "@/components/shared/GradientText";
 
 const CATEGORIES = [
   { href: "/category/ai", label: "인공지능" },
@@ -43,8 +44,7 @@ export default function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-1.5 text-lg font-bold tracking-tight text-text-primary">
           <Zap size={18} className="text-emerald-400" />
-          Dev
-          <span className="text-emerald-400">Pulse</span>
+          <GradientText>DevPulse</GradientText>
           <span className="ml-1 inline-block h-2 w-2 rounded-full bg-emerald-400 animate-pulse-dot" />
         </Link>
 

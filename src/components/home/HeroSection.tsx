@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Newspaper, FolderOpen, RefreshCw, Tag } from "lucide-react";
 import Button from "@/components/shared/Button";
+import TypewriterText from "@/components/shared/TypewriterText";
 
 interface HeroSectionProps {
   totalArticles: number;
@@ -67,6 +68,11 @@ export default function HeroSection({
         <div className="absolute left-1/2 top-10 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,rgba(34,211,238,0.06),transparent_70%)]" />
       </div>
 
+      {/* Floating dots */}
+      <div className="floating-dots">
+        {Array.from({ length: 20 }).map((_, i) => <span key={i} />)}
+      </div>
+
       {/* Badge */}
       <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-1.5 text-xs font-medium text-text-secondary backdrop-blur-sm">
         <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
@@ -88,20 +94,20 @@ export default function HeroSection({
 
       {/* Subtitle */}
       <p className="mx-auto mt-5 max-w-xl text-base text-text-secondary md:text-lg">
-        주니어 개발자를 위한 기술 펄스 — 하루 5분, 오늘의 기술 트렌드를 한눈에
+        <TypewriterText text="주니어 개발자를 위한 기술 펄스 — 하루 5분, 오늘의 기술 트렌드를 한눈에" speed={30} />
       </p>
 
       {/* Stats */}
       <div className="mx-auto mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-text-muted md:gap-10">
-        <div className="flex items-center gap-2">
+        <div className="animate-fade-in-up stagger-stat flex items-center gap-2">
           <Newspaper size={18} className="text-emerald-400" />
           <span>총 <strong className="text-text-primary">{displayTotal.toLocaleString()}</strong>개 글</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="animate-fade-in-up stagger-stat flex items-center gap-2">
           <FolderOpen size={18} className="text-cyan-400" />
           <span><strong className="text-text-primary">6</strong>개 카테고리</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="animate-fade-in-up stagger-stat flex items-center gap-2">
           <RefreshCw size={18} className="text-emerald-400" />
           <span><strong className="text-emerald-400">{displayToday.toLocaleString()}</strong>개 오늘 수집</span>
         </div>

@@ -1,9 +1,11 @@
 "use client";
 
 import Card from "@/components/shared/Card";
+import GlowCard from "@/components/shared/GlowCard";
 import Badge from "@/components/shared/Badge";
 import Skeleton from "@/components/shared/Skeleton";
 import Button from "@/components/shared/Button";
+import DateFormatter from "@/components/shared/DateFormatter";
 import { Eye, Clock } from "lucide-react";
 
 interface Article {
@@ -36,7 +38,7 @@ const CATEGORY_DOT: Record<string, string> = {
 
 function estimateReadingTime(content?: string): string {
   if (!content) return "3분";
-  return Math.max(1, Math.ceil(content.length / 300)) + "분";
+  return Math.max(1, Math.ceil(content.length / 200)) + "분";
 }
 
 export default function ArticleGrid({ articles, loading, onLoadMore, hasMore }: ArticleGridProps) {
@@ -74,7 +76,8 @@ export default function ArticleGrid({ articles, loading, onLoadMore, hasMore }: 
       <h2 className="mb-4 text-lg font-bold text-text-primary">최신 뉴스</h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {articles.map((article) => (
-          <Card key={article.id} href={`/article/${article.id}`}>
+          <GlowCard key={article.id} className="card-hover">
+            <Card href={`/article/${article.id}`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <span className={`h-2 w-2 rounded-full ${CATEGORY_DOT[article.category] || "bg-cyan-400"}`} />
@@ -110,9 +113,10 @@ export default function ArticleGrid({ articles, loading, onLoadMore, hasMore }: 
                 <Clock className="h-3 w-3" />
                 {estimateReadingTime(article.content)}
               </span>
-              <span>{article.publishedAt}</span>
+              <span><DateFormatter date={article.publishedAt} /></span>
             </div>
           </Card>
+          </GlowCard>
         ))}
       </div>
       {hasMore && (
