@@ -53,6 +53,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       type: "article",
       publishedTime: article.publishedAt.toISOString(),
       modifiedTime: article.updatedAt.toISOString(),
+      authors: ["DevPulse"],
+      tags: article.tags ? JSON.parse(article.tags || "[]") : [],
       locale: "ko_KR",
       images: [
         {
@@ -65,6 +67,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     },
     twitter: {
       card: "summary_large_image",
+      site: "@devpulse",
+      creator: "@devpulse",
       title: article.title,
       description,
       images: [

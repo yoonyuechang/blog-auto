@@ -4,13 +4,27 @@ import TagsClient from "./TagsClient";
 
 export const dynamic = "force-dynamic";
 
+const SITE_URL = "https://blog-auto-woad.vercel.app";
+
 export const metadata: Metadata = {
   title: "태그 | DevPulse",
   description: "DevPulse의 모든 태그를 한눈에 확인하세요. 관심 분야별 아티클을 빠르게 찾아보세요.",
   openGraph: {
     title: "태그 | DevPulse",
     description: "관심 분야별 아티클 태그 모아보기",
+    url: `${SITE_URL}/tags`,
+    siteName: "DevPulse",
     type: "website",
+    locale: "ko_KR",
+    images: [{ url: `${SITE_URL}/api/og?title=DevPulse%20Tags`, width: 1200, height: 630, alt: "DevPulse Tags" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@devpulse",
+    creator: "@devpulse",
+    title: "태그 | DevPulse",
+    description: "관심 분야별 아티클 태그 모아보기",
+    images: [{ url: `${SITE_URL}/api/og?title=DevPulse%20Tags`, alt: "DevPulse Tags" }],
   },
 };
 

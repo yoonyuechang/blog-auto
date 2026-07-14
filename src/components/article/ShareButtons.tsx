@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Twitter, Link2, MessageCircle, Check, Linkedin } from "lucide-react";
+import { Twitter, Link2, MessageCircle, Check, Linkedin, Mail } from "lucide-react";
 
 interface ShareButtonsProps {
   title: string;
@@ -72,6 +72,36 @@ export default function ShareButtons({ title, url, shareCount = 0 }: ShareButton
           <span>KakaoTalk</span>
         </a>
         {hoveredBtn === "kakao" && <span className={tooltipStyle}>카카오 공유하기</span>}
+      </div>
+
+      <div className="relative">
+        <a
+          href={`https://reddit.com/submit?url=${encodedUrl}&title=${encodedTitle}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Reddit에서 공유하기"
+          className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-border hover:text-text-primary"
+          onMouseEnter={() => setHoveredBtn("reddit")}
+          onMouseLeave={() => setHoveredBtn(null)}
+        >
+          <span className="text-xs font-bold">R</span>
+          <span>Reddit</span>
+        </a>
+        {hoveredBtn === "reddit" && <span className={tooltipStyle}>Reddit에서 공유하기</span>}
+      </div>
+
+      <div className="relative">
+        <a
+          href={`mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A%0A${encodedUrl}`}
+          aria-label="이메일로 공유하기"
+          className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-sm text-text-secondary transition-colors hover:bg-border hover:text-text-primary"
+          onMouseEnter={() => setHoveredBtn("email")}
+          onMouseLeave={() => setHoveredBtn(null)}
+        >
+          <Mail size={16} />
+          <span>Email</span>
+        </a>
+        {hoveredBtn === "email" && <span className={tooltipStyle}>이메일로 공유하기</span>}
       </div>
 
       <div className="relative">

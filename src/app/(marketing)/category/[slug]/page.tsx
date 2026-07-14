@@ -29,31 +29,29 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     where: { category: category.name, status: "approved" },
   });
 
+  const ogTitle = `DevPulse - ${category.name} \uC544\uD2F0\uD074`;
+  const ogDescription = `DevPulse\uC5D0\uC11C ${category.name} \uAD00\uB828 \uCD5C\uC2E0 \uC544\uD2F0\uD074\uC744 \uD655\uC778\uD558\uC138\uC694`;
+  const ogImage = `${SITE_URL}/api/og?title=${encodeURIComponent(category.name)}&category=${encodeURIComponent(category.slug)}`;
+
   return {
     title: `${category.name} | DevPulse`,
     description: category.description || `${category.name} \uCEA4\uB3C4\uC758 \uCD5C\uC2E0 IT \uD2B8\uB808\uB4DC\uC640 \uAE30\uC220 \uB274\uC2A4 \u2014 \uCD1D ${articleCount}\uAC1C\uC758 \uC544\uD2F0\uD074`,
     openGraph: {
-      title: `${category.name} | DevPulse`,
-      description: category.description || `${category.name} \uCEA4\uB3C4`,
+      title: ogTitle,
+      description: ogDescription,
+      url: `${SITE_URL}/category/${params.slug}`,
+      siteName: "DevPulse",
       type: "website",
-      images: [
-        {
-          url: `${SITE_URL}/api/og?title=${encodeURIComponent(category.name)}&category=${encodeURIComponent(category.slug)}`,
-          width: 1200,
-          height: 630,
-          alt: category.name,
-        },
-      ],
+      locale: "ko_KR",
+      images: [{ url: ogImage, width: 1200, height: 630, alt: category.name }],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${category.name} | DevPulse`,
-      images: [
-        {
-          url: `${SITE_URL}/api/og?title=${encodeURIComponent(category.name)}&category=${encodeURIComponent(category.slug)}`,
-          alt: category.name,
-        },
-      ],
+      site: "@devpulse",
+      creator: "@devpulse",
+      title: ogTitle,
+      description: ogDescription,
+      images: [{ url: ogImage, alt: category.name }],
     },
   };
 }

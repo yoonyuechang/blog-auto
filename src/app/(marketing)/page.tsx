@@ -8,8 +8,27 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
+const SITE_URL = "https://blog-auto-woad.vercel.app";
+
 export const metadata = {
   keywords: "기술블로그, IT트렌드, 개발자, AI, 프로그래밍, 주니어개발자",
+  openGraph: {
+    title: "DevPulse - AI\uAC00 \uCF54\uC574\uD30C\uC774\uD558\uB294 IT \uD2B8\uB808\uB4DC",
+    description: "\uB9E8\uC8FC \uD654\uC694\uC77C, AI\uAC00 \uC120\uD589\uD55C \uCD5C\uC2E0 IT \uD2B8\uB808\uB4DC\uB97C \uBC1B\uC5B4\uBCF4\uC138\uC694",
+    url: SITE_URL,
+    siteName: "DevPulse",
+    type: "website",
+    locale: "ko_KR",
+    images: [{ url: `${SITE_URL}/api/og?title=DevPulse`, width: 1200, height: 630, alt: "DevPulse" }],
+  },
+  twitter: {
+    card: "summary_large_image" as const,
+    site: "@devpulse",
+    creator: "@devpulse",
+    title: "DevPulse - AI\uAC00 \uCF54\uC574\uD30C\uC774\uD558\uB294 IT \uD2B8\uB808\uB4DC",
+    description: "\uB9E8\uC8FC \uD654\uC694\uC77C, AI\uAC00 \uC120\uD589\uD55C \uCD5C\uC2E0 IT \uD2B8\uB808\uB4DC\uB97C \uBC1B\uC5B4\uBCF4\uC138\uC694",
+    images: [{ url: `${SITE_URL}/api/og?title=DevPulse`, alt: "DevPulse" }],
+  },
 };
 
 export default async function HomePage() {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Newspaper, FolderOpen, RefreshCw, Tag } from "lucide-react";
+import AnimatedSection from "@/components/shared/AnimatedSection";
 import Button from "@/components/shared/Button";
 import GradientBorder from "@/components/shared/GradientBorder";
 import TypewriterText from "@/components/shared/TypewriterText";
@@ -74,111 +75,118 @@ export default function HeroSection({
         {Array.from({ length: 20 }).map((_, i) => <span key={i} />)}
       </div>
 
-      {/* Badge */}
-      <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-1.5 text-xs font-medium text-text-secondary backdrop-blur-sm">
-        <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
-        매일 자동 수집 · AI 요약
-      </div>
-
-      {/* Headline */}
-      <h1 className="mx-auto max-w-3xl text-4xl font-extrabold leading-tight tracking-tight md:text-6xl md:leading-[1.1]">
-        <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent animate-gradient">
-          DevPulse
-        </span>
-        <br />
-        <span className="mt-2 block text-text-primary">
-          매일 AI가 요약하는
-          <br className="hidden md:block" />
-          IT 트렌드
-        </span>
-      </h1>
-
-      {/* Subtitle */}
-      <p className="mx-auto mt-5 max-w-xl text-base text-text-secondary md:text-lg">
-        <TypewriterText text="주니어 개발자를 위한 기술 펄스 — 하루 5분, 오늘의 기술 트렌드를 한눈에" speed={30} />
-      </p>
-
-      {/* Stats */}
-      <div className="mx-auto mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-text-muted md:gap-10">
-        <div className="animate-fade-in-up stagger-stat flex items-center gap-2">
-          <Newspaper size={18} className="text-emerald-400" />
-          <span>총 <strong className="text-text-primary">{displayTotal.toLocaleString()}</strong>개 글</span>
+      <AnimatedSection delay={0}>
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-4 py-1.5 text-xs font-medium text-text-secondary backdrop-blur-sm">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse-dot" />
+          매일 자동 수집 · AI 요약
         </div>
-        <div className="animate-fade-in-up stagger-stat flex items-center gap-2">
-          <FolderOpen size={18} className="text-cyan-400" />
-          <span><strong className="text-text-primary">6</strong>개 카테고리</span>
-        </div>
-        <div className="animate-fade-in-up stagger-stat flex items-center gap-2">
-          <RefreshCw size={18} className="text-emerald-400" />
-          <span><strong className="text-emerald-400">{displayToday.toLocaleString()}</strong>개 오늘 수집</span>
-        </div>
-      </div>
+      </AnimatedSection>
 
-      {/* Trending tags */}
-      <div className="mx-auto mt-8 flex max-w-2xl flex-wrap items-center justify-center gap-2">
-        <Tag size={14} className="mr-1 text-text-muted" />
-        {trendingTags.map((tag) => (
-          <a
-            key={tag}
-            href={`/search?q=${encodeURIComponent(tag)}`}
-            className="rounded-full border border-border bg-card/50 px-3 py-1 text-xs font-medium text-text-secondary transition-colors hover:border-emerald-400/50 hover:text-emerald-400"
-          >
-            {tag}
-          </a>
-        ))}
-      </div>
+      <AnimatedSection delay={100}>
+        <h1 className="mx-auto max-w-3xl text-4xl font-extrabold leading-tight tracking-tight md:text-6xl md:leading-[1.1]">
+          <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent animate-gradient">
+            DevPulse
+          </span>
+          <br />
+          <span className="mt-2 block text-text-primary">
+            매일 AI가 요약하는
+            <br className="hidden md:block" />
+            IT 트렌드
+          </span>
+        </h1>
+      </AnimatedSection>
 
-      {/* Social proof */}
-      <div className="mx-auto mt-8 flex flex-col items-center gap-3">
-        <p className="text-sm text-text-muted">
-          이미 <strong className="text-text-primary">1,000+</strong> 개발자가 구독하고 있습니다
+      <AnimatedSection delay={200}>
+        <p className="mx-auto mt-5 max-w-xl text-base text-text-secondary md:text-lg">
+          <TypewriterText text="주니어 개발자를 위한 기술 펄스 — 하루 5분, 오늘의 기술 트렌드를 한눈에" speed={30} />
         </p>
-        <div className="flex -space-x-2">
-          {[0,1,2,3].map((i) => (
-            <div
-              key={i}
-              className="h-8 w-8 rounded-full border-2 border-background bg-gradient-to-br from-emerald-400 to-cyan-400"
-              style={{ opacity: 1 - i * 0.15 }}
-            />
-          ))}
-          <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-card text-[10px] font-medium text-text-muted">
-            +1k
+      </AnimatedSection>
+
+      <AnimatedSection delay={300}>
+        <div className="mx-auto mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-text-muted md:gap-10">
+          <div className="animate-fade-in-up stagger-stat flex items-center gap-2">
+            <Newspaper size={18} className="text-emerald-400" />
+            <span>총 <strong className="text-text-primary">{displayTotal.toLocaleString()}</strong>개 글</span>
+          </div>
+          <div className="animate-fade-in-up stagger-stat flex items-center gap-2">
+            <FolderOpen size={18} className="text-cyan-400" />
+            <span><strong className="text-text-primary">6</strong>개 카테고리</span>
+          </div>
+          <div className="animate-fade-in-up stagger-stat flex items-center gap-2">
+            <RefreshCw size={18} className="text-emerald-400" />
+            <span><strong className="text-emerald-400">{displayToday.toLocaleString()}</strong>개 오늘 수집</span>
           </div>
         </div>
-        <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-text-muted">
-          <span className="flex items-center gap-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-            매주 화요일 배포
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
-            AI 큐레이션
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-            무료
-          </span>
-        </div>
-      </div>
+      </AnimatedSection>
 
-      {/* Subscribe form */}
-      <form onSubmit={handleSubscribe} aria-label="뉴스레터 구독" className="mx-auto mt-8 flex max-w-md gap-2">
-        <label htmlFor="hero-email" className="sr-only">이메일 주소</label>
-        <input
-          id="hero-email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="이메일을 입력하세요"
-          className="flex-1 rounded-lg border border-border bg-card/60 px-4 py-3 text-sm text-text-primary placeholder-text-muted backdrop-blur-sm focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400/50"
-          required
-        />
-        <GradientBorder>
-          <Button type="submit" disabled={subscribed || loading} size="lg">
-            {subscribed ? "구독 완료!" : loading ? "구독 중..." : "구독하기"}
-          </Button>
-        </GradientBorder>
-      </form>
+      <AnimatedSection delay={400}>
+        <div className="mx-auto mt-8 flex max-w-2xl flex-wrap items-center justify-center gap-2">
+          <Tag size={14} className="mr-1 text-text-muted" />
+          {trendingTags.map((tag) => (
+            <a
+              key={tag}
+              href={`/search?q=${encodeURIComponent(tag)}`}
+              className="rounded-full border border-border bg-card/50 px-3 py-1 text-xs font-medium text-text-secondary transition-colors hover:border-emerald-400/50 hover:text-emerald-400"
+            >
+              {tag}
+            </a>
+          ))}
+        </div>
+      </AnimatedSection>
+
+      <AnimatedSection delay={500}>
+        <div className="mx-auto mt-8 flex flex-col items-center gap-3">
+          <p className="text-sm text-text-muted">
+            이미 <strong className="text-text-primary">1,000+</strong> 개발자가 구독하고 있습니다
+          </p>
+          <div className="flex -space-x-2">
+            {[0,1,2,3].map((i) => (
+              <div
+                key={i}
+                className="h-8 w-8 rounded-full border-2 border-background bg-gradient-to-br from-emerald-400 to-cyan-400"
+                style={{ opacity: 1 - i * 0.15 }}
+              />
+            ))}
+            <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-card text-[10px] font-medium text-text-muted">
+              +1k
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-3 text-xs text-text-muted">
+            <span className="flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              매주 화요일 배포
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+              AI 큐레이션
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              무료
+            </span>
+          </div>
+        </div>
+      </AnimatedSection>
+
+      <AnimatedSection delay={600}>
+        <form onSubmit={handleSubscribe} aria-label="뉴스레터 구독" className="mx-auto mt-8 flex max-w-md gap-2">
+          <label htmlFor="hero-email" className="sr-only">이메일 주소</label>
+          <input
+            id="hero-email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="이메일을 입력하세요"
+            className="flex-1 rounded-lg border border-border bg-card/60 px-4 py-3 text-sm text-text-primary placeholder-text-muted backdrop-blur-sm focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400/50"
+            required
+          />
+          <GradientBorder>
+            <Button type="submit" disabled={subscribed || loading} size="lg">
+              {subscribed ? "구독 완료!" : loading ? "구독 중..." : "구독하기"}
+            </Button>
+          </GradientBorder>
+        </form>
+      </AnimatedSection>
     </section>
   );
 }

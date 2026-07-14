@@ -1,13 +1,27 @@
 import type { Metadata } from "next";
 import { Zap, Brain, Rss, BarChart3, Users, Github } from "lucide-react";
 
+const SITE_URL = "https://blog-auto-woad.vercel.app";
+
 export const metadata: Metadata = {
   title: "소개 | DevPulse",
   description: "DevPulse는 AI가 큐레이션하는 IT 트렌드 블로그입니다. 실시간으로 최신 기술 뉴스를 수집하고 전문적으로 분석합니다.",
   openGraph: {
     title: "소개 | DevPulse",
     description: "AI가 큐레이션하는 IT 트렌드 블로그",
+    url: `${SITE_URL}/about`,
+    siteName: "DevPulse",
     type: "website",
+    locale: "ko_KR",
+    images: [{ url: `${SITE_URL}/api/og?title=DevPulse%20About`, width: 1200, height: 630, alt: "DevPulse 소개" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@devpulse",
+    creator: "@devpulse",
+    title: "소개 | DevPulse",
+    description: "AI가 큐레이션하는 IT 트렌드 블로그",
+    images: [{ url: `${SITE_URL}/api/og?title=DevPulse%20About`, alt: "DevPulse 소개" }],
   },
 };
 
