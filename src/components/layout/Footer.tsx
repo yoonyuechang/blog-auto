@@ -25,6 +25,7 @@ export default function Footer() {
               <li><Link href="/category/opensource" className="transition-colors hover:text-emerald-400">오픈소스</Link></li>
               <li><Link href="/category/research" className="transition-colors hover:text-emerald-400">논문/리서치</Link></li>
               <li><Link href="/category/career" className="transition-colors hover:text-emerald-400">커리어</Link></li>
+              <li><Link href="/category/other" className="transition-colors hover:text-emerald-400">기타</Link></li>
             </ul>
           </nav>
 

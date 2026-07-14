@@ -1,4 +1,5 @@
 import Badge from "@/components/shared/Badge";
+import ViewCounter from "@/components/article/ViewCounter";
 import { ExternalLink, Calendar, Clock, RotateCcw } from "lucide-react";
 
 interface ArticleHeaderProps {
@@ -10,6 +11,7 @@ interface ArticleHeaderProps {
   publishedAt: string;
   updatedAt?: string;
   viewCount?: number;
+  articleId?: number;
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -29,6 +31,7 @@ export default function ArticleHeader({
   publishedAt,
   updatedAt,
   viewCount,
+  articleId,
 }: ArticleHeaderProps) {
   const catColor = CATEGORY_COLORS[category] || "bg-cyan-950 text-cyan-400";
 
@@ -53,7 +56,9 @@ export default function ArticleHeader({
         </a>
         <Badge level={difficultyLevel as "입문/초급" | "중급" | "고급"} size="md" />
         {viewCount != null && viewCount > 0 && (
-          <span className="text-xs text-text-muted">{viewCount.toLocaleString()}회 조회</span>
+          <span className="text-xs text-text-muted">
+            {articleId ? <ViewCounter articleId={articleId} initialCount={viewCount ?? 0} /> : (viewCount ?? 0).toLocaleString()}회 조회
+          </span>
         )}
       </div>
 

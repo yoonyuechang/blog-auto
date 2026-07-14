@@ -5,6 +5,10 @@ import NewsletterInline from "@/components/shared/NewsletterInline";
 
 export const dynamic = "force-dynamic";
 
+export const metadata = {
+  keywords: "기술블로그, IT트렌드, 개발자, AI, 프로그래밍, 주니어개발자",
+};
+
 export default async function HomePage() {
   const totalArticles = await db.article.count({ where: { status: "approved" } });
 

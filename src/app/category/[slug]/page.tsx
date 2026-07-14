@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import CategoryClient from "./CategoryClient";
+import Breadcrumb from "@/components/shared/Breadcrumb";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -10,12 +11,12 @@ interface PageProps {
 }
 
 const ICON_MAP: Record<string, string> = {
-  "인공지능": "Brain",
-  "웹개발": "Globe",
-  "오픈소스": "Github",
-  "논문/리서치": "BookOpen",
-  "커리어": "Briefcase",
-  "기타": "Layers",
+  "brain": "🧠",
+  "code": "💻",
+  "git-branch": "🔀",
+  "file-text": "📄",
+  "briefcase": "💼",
+  "layers": "📚",
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -73,6 +74,12 @@ export default async function CategoryPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="mx-auto max-w-6xl px-4 py-12">
+        <Breadcrumb
+          items={[
+            { label: "홈", href: "/" },
+            { label: category.name },
+          ]}
+        />
         <div className="mb-8">
           <div className="flex items-center gap-3">
             <span className="text-2xl">{ICON_MAP[category.icon] || "Folder"}</span>

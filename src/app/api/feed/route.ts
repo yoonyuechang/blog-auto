@@ -16,8 +16,8 @@ export async function GET() {
         (a) => `    <item>
       <title><![CDATA[${a.title}]]></title>
       <description><![CDATA[${a.aiSummary || a.summary}]]></description>
-      <link>${siteUrl}/articles/${a.id}</link>
-      <guid isPermaLink="false">${siteUrl}/articles/${a.id}</guid>
+      <link>${siteUrl}/article/${a.id}</link>
+      <guid isPermaLink="false">${siteUrl}/article/${a.id}</guid>
       <pubDate>${new Date(a.publishedAt).toUTCString()}</pubDate>
       <category>${a.category}</category>
     </item>`

@@ -10,7 +10,7 @@ const CATEGORIES = [
   { href: "/category/opensource", label: "오픈소스" },
   { href: "/category/research", label: "논문/리서치" },
   { href: "/category/career", label: "커리어" },
-  { href: "/category/etc", label: "기타" },
+  { href: "/category/other", label: "기타" },
 ];
 
 export default function Header() {

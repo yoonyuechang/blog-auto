@@ -20,12 +20,12 @@ interface CategoryInfo {
 }
 
 const CATEGORIES: CategoryInfo[] = [
-  { name: "프론트엔드", slug: "프론트엔드", description: "UI/UX와 클라이언트 기술", icon: Code2, borderColor: "border-blue-400/40 hover:border-blue-400", count: 0 },
-  { name: "백엔드", slug: "백엔드", description: "서버, API, 데이터베이스", icon: Server, borderColor: "border-violet-400/40 hover:border-violet-400", count: 0 },
-  { name: "AI/ML", slug: "AI/ML", description: "인공지능과 머신러닝", icon: BrainCircuit, borderColor: "border-amber-400/40 hover:border-amber-400", count: 0 },
-  { name: "인프라", slug: "인프라", description: "클라우드와 배포 전략", icon: Cloud, borderColor: "border-rose-400/40 hover:border-rose-400", count: 0 },
-  { name: "개발문화", slug: "개발문화", description: "팀 워크플로우와 성장", icon: Users, borderColor: "border-cyan-400/40 hover:border-cyan-400", count: 0 },
-  { name: "CS/이론", slug: "CS/이론", description: "컴퓨터 과학 기초", icon: BookOpen, borderColor: "border-emerald-400/40 hover:border-emerald-400", count: 0 },
+  { name: "인공지능", slug: "ai", description: "AI, 머신러닝, 딥러닝 관련 뉴스", icon: BrainCircuit, borderColor: "border-cyan-400/40 hover:border-cyan-400", count: 0 },
+  { name: "웹개발", slug: "web", description: "프론트엔드, 백엔드, 프레임워크", icon: Code2, borderColor: "border-emerald-400/40 hover:border-emerald-400", count: 0 },
+  { name: "오픈소스", slug: "opensource", description: "오픈소스 프로젝트와 커뮤니티", icon: Server, borderColor: "border-violet-400/40 hover:border-violet-400", count: 0 },
+  { name: "논문/리서치", slug: "research", description: "학술 논문과 연구 동향", icon: BookOpen, borderColor: "border-violet-400/40 hover:border-violet-400", count: 0 },
+  { name: "커리어", slug: "career", description: "개발자 커리어와 성장", icon: Users, borderColor: "border-amber-400/40 hover:border-amber-400", count: 0 },
+  { name: "기타", slug: "other", description: "기타 기술 뉴스", icon: Cloud, borderColor: "border-slate-400/40 hover:border-slate-400", count: 0 },
 ];
 
 export default function CategoryShowcase({ counts }: { counts?: Record<string, number> }) {

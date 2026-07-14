@@ -12,6 +12,7 @@ import ShareButtons from "@/components/article/ShareButtons";
 import NewsletterInline from "@/components/shared/NewsletterInline";
 import AdSense from "@/components/shared/AdSense";
 import AuthorBio from "@/components/article/AuthorBio";
+import ViewCounter from "@/components/article/ViewCounter";
 import Link from "next/link";
 import {
   generateBreadcrumbSchema,
@@ -64,8 +65,6 @@ export default async function ArticlePage({ params }: PageProps) {
   const article = await db.article.findUnique({ where: { id } });
   if (!article || article.status !== "approved") notFound();
 
-  await db.article.update({ where: { id }, data: { viewCount: { increment: 1 } } });
-
   const related = await db.article.findMany({
     where: { category: article.category, status: "approved", id: { not: id } },
     orderBy: { publishedAt: "desc" },
@@ -108,9 +107,9 @@ export default async function ArticlePage({ params }: PageProps) {
         <Link href={`/category/${article.category}`} className="text-xs font-medium text-text-muted hover:text-emerald-400">
           #{article.category}
         </Link>
-        {article.tags && article.tags.split(",").map((tag: string) => (
-          <Link key={tag} href={`/search?q=${encodeURIComponent(tag.trim())}`} className="text-xs text-text-muted hover:text-emerald-400">
-            #{tag.trim()}
+        {article.tags && JSON.parse(article.tags || "[]").map((tag: string) => (
+          <Link key={tag} href={`/search?q=${encodeURIComponent(tag)}`} className="text-xs text-text-muted hover:text-emerald-400">
+            #{tag}
           </Link>
         ))}
       </div>
@@ -124,6 +123,7 @@ export default async function ArticlePage({ params }: PageProps) {
         publishedAt={article.publishedAt.toISOString().split("T")[0]}
         updatedAt={updatedDate}
         viewCount={article.viewCount}
+        articleId={article.id}
       />
 
       {headings.length > 2 && <TableOfContents headings={headings} />}

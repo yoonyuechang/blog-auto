@@ -8,6 +8,7 @@ import ArticleGrid from "@/components/home/ArticleGrid";
 import FeaturedArticle from "@/components/home/FeaturedArticle";
 import AdSense from "@/components/shared/AdSense";
 import CategoryShowcase from "@/components/home/CategoryShowcase";
+import NewsletterBanner from "@/components/home/NewsletterBanner";
 
 interface Article {
   id: number;
@@ -89,6 +90,7 @@ export default function HomeClient({ initialTrending, featuredArticle, weeklyTop
       <CategoryTabs categories={categories} activeCategory={activeCategory} onSelect={setActiveCategory} />
       <TrendingCards articles={initialTrending} />
       <WeeklyDigest articles={weeklyTop} />
+      <NewsletterBanner />
       <AdSense slot="0000000000" format="horizontal" />
       <ArticleGrid articles={articles} loading={loading} onLoadMore={handleLoadMore} hasMore={hasMore} />
     </>

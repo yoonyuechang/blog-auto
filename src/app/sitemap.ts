@@ -9,15 +9,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       where: { status: "approved" },
       select: { id: true, updatedAt: true, category: true },
     }),
-    db.article.findMany({
-      where: { status: "approved" },
-      select: { category: true },
-      distinct: ["category"],
+    db.category.findMany({
+      select: { slug: true },
     }),
   ]);
 
   const categoryUrls = categories.map((c) => ({
-    url: `${BASE}/category/${encodeURIComponent(c.category)}`,
+    url: `${BASE}/category/${encodeURIComponent(c.slug)}`,
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
     priority: 0.7,
