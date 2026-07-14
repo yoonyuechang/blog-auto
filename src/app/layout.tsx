@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import SearchModal from "@/components/search/SearchModal";
-import ScrollToTop from "@/components/shared/ScrollToTop";
-import ScrollProgress from "@/components/shared/ScrollProgress";
 
 export const metadata: Metadata = {
   title: "DevPulse - 주니어 개발자를 위한 IT 트렌드 블로그",
@@ -93,12 +88,7 @@ gtag('config', 'G-XXXXXXXXXX');`}
         >
           본문으로 건너뛰기
         </a>
-        <ScrollProgress />
-        <SearchModal />
-        <Header />
-        <main id="main-content" className="min-h-screen">{children}</main>
-        <Footer />
-        <ScrollToTop />
+        {children}
       </body>
     </html>
   );

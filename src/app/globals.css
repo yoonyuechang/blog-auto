@@ -202,3 +202,17 @@ a, button, input, [role="button"] {
   transition-timing-function: ease;
   transition-duration: 200ms;
 }
+
+/* Mobile optimizations */
+button, a, input, select, textarea {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+input, textarea, select {
+  font-size: 16px; /* prevent iOS auto-zoom */
+}
+
+body {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}

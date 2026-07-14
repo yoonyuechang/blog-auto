@@ -4,15 +4,39 @@ import AdminClient from "./AdminClient";
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  const [approvedArticles, pendingArticles, totalSubscribers, sources, subscribers, viewsResult] =
-    await Promise.all([
-      db.article.count({ where: { status: "approved" } }),
-      db.article.findMany({ where: { status: "pending_approval" }, orderBy: { createdAt: "desc" } }),
-      db.newsletter.count({ where: { isActive: true } }),
-      db.source.findMany(),
-      db.newsletter.findMany({ orderBy: { subscribedAt: "desc" } }),
-      db.article.aggregate({ _sum: { viewCount: true } }),
-    ]);
+  const now = new Date();
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+  const [
+    approvedArticles,
+    pendingArticles,
+    totalSubscribers,
+    sources,
+    subscribers,
+    viewsResult,
+    articlesThisWeek,
+    recentArticles,
+  ] = await Promise.all([
+    db.article.count({ where: { status: "approved" } }),
+    db.article.findMany({ where: { status: "pending_approval" }, orderBy: { createdAt: "desc" } }),
+    db.newsletter.count({ where: { isActive: true } }),
+    db.source.findMany(),
+    db.newsletter.findMany({ orderBy: { subscribedAt: "desc" } }),
+    db.article.aggregate({ _sum: { viewCount: true } }),
+    db.article.count({ where: { status: "approved", createdAt: { gte: weekAgo } } }),
+    db.article.findMany({
+      where: { status: "approved" },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+      select: {
+        id: true,
+        title: true,
+        category: true,
+        viewCount: true,
+        createdAt: true,
+      },
+    }),
+  ]);
 
   return (
     <AdminClient
@@ -22,6 +46,8 @@ export default async function AdminPage() {
           pendingArticles: pendingArticles.length,
           totalSubscribers,
           totalViews: viewsResult._sum.viewCount || 0,
+          sourcesCount: sources.length,
+          articlesThisWeek,
         },
         pendingArticles: pendingArticles.map((a) => ({
           id: a.id,
@@ -37,6 +63,13 @@ export default async function AdminPage() {
           email: s.email,
           subscribedAt: s.subscribedAt.toISOString().split("T")[0],
           isActive: s.isActive,
+        })),
+        recentArticles: recentArticles.map((a) => ({
+          id: a.id,
+          title: a.title,
+          category: a.category,
+          viewCount: a.viewCount,
+          createdAt: a.createdAt.toISOString().split("T")[0],
         })),
       }}
     />

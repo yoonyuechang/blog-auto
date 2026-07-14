@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import HeroSection from "@/components/home/HeroSection";
 import HomeClient from "./HomeClient";
 import NewsletterInline from "@/components/shared/NewsletterInline";
+import PullToRefresh from "@/components/shared/PullToRefresh";
 
 export const dynamic = "force-dynamic";
 
@@ -74,7 +75,7 @@ export default async function HomePage() {
   }
 
   return (
-    <>
+    <PullToRefresh>
       <HeroSection totalArticles={totalArticles} todayArticles={todayArticles} />
       <HomeClient
         initialTrending={trending.map((a) => ({
@@ -93,6 +94,6 @@ export default async function HomePage() {
         tagCounts={tagCounts}
       />
       <NewsletterInline />
-    </>
+    </PullToRefresh>
   );
 }

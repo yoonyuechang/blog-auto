@@ -11,12 +11,12 @@ interface PageProps {
 }
 
 const ICON_MAP: Record<string, string> = {
-  "brain": "🧠",
-  "code": "💻",
-  "git-branch": "🔀",
-  "file-text": "📄",
-  "briefcase": "💼",
-  "layers": "📚",
+  "brain": "\uD83E\uDDE0",
+  "code": "\uD83D\uDCBB",
+  "git-branch": "\uD83D\uDD00",
+  "file-text": "\uD83D\uDCC4",
+  "briefcase": "\uD83D\uDCBC",
+  "layers": "\uD83D\uDCDA",
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -29,10 +29,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `${category.name} | DevPulse`,
-    description: category.description || `${category.name} 카테고리의 최신 IT 트렌드와 기술 뉴스 — 총 ${articleCount}개의 아티클`,
+    description: category.description || `${category.name} \uCEA4\uB3C4\uC758 \uCD5C\uC2E0 IT \uD2B8\uB808\uB4DC\uC640 \uAE30\uC220 \uB274\uC2A4 \u2014 \uCD1D ${articleCount}\uAC1C\uC758 \uC544\uD2F0\uD074`,
     openGraph: {
       title: `${category.name} | DevPulse`,
-      description: category.description || `${category.name} 카테고리`,
+      description: category.description || `${category.name} \uCEA4\uB3C4`,
       type: "website",
     },
   };
@@ -76,7 +76,7 @@ export default async function CategoryPage({ params }: PageProps) {
       <div className="mx-auto max-w-6xl px-4 py-12">
         <Breadcrumb
           items={[
-            { label: "홈", href: "/" },
+            { label: "\uD648", href: "/" },
             { label: category.name },
           ]}
         />
@@ -90,7 +90,7 @@ export default async function CategoryPage({ params }: PageProps) {
               )}
             </div>
             <span className="ml-auto rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-text-muted">
-              {totalCount}개 아티클
+              {totalCount}\uAC1C \uC544\uD2F0\uD074
             </span>
           </div>
         </div>
