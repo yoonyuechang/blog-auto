@@ -18,27 +18,10 @@ TOPICS = [
     "무료 AI 툴 5개로 생산성 2배 올리기",
 ]
 
-HF_TOKEN = os.environ.get("HF_TOKEN", "")
-HF_HEADERS = {"Authorization": f"Bearer {HF_TOKEN}"} if HF_TOKEN else {}
-
-MODELS = [
-    "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-7B-Instruct",
-    "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3",
-]
+GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-lite:generateContent"
 
 print("[START] generate_post.py")
-
-def call_hf(url: str, prompt: str) -> str:
-    print(f"[HF] Calling {url.split('/')[-1]}...")
-    resp = requests.post(url, headers=HF_HEADERS, json={
-        "inputs": f"<s>[INST] {prompt} [/INST]",
-        "parameters": {"max_new_tokens": 2048, "temperature": 0.7, "return_full_text": False}
-    }, timeout=120)
-    if resp.status_code == 503:
-        raise Exception("Model loading")
-    resp.raise_for_status()
-    result = resp.json()
-    return result[0]["generated_text"] if isinstance(result, list) else result["choices"][0]["message"]["content"]
 
 PROMPT = """당신은 한국의 IT/재테크 블로거입니다. 아래 주제로 블로그 글을 써주세요.
 
@@ -55,26 +38,41 @@ PROMPT = """당신은 한국의 IT/재테크 블로거입니다. 아래 주제�
 - HTML 형식으로 출력
 - <body>나 <html> 태그는 포함하지 말고 내용만 출력"""
 
+def call_gemini(prompt: str) -> str:
+    resp = requests.post(
+        f"{GEMINI_URL}?key={GEMINI_KEY}",
+        json={"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"maxOutputTokens": 4096, "temperature": 0.7}},
+        timeout=60
+    )
+    if resp.status_code == 429:
+        raise Exception("Quota exceeded")
+    resp.raise_for_status()
+    return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+
 def generate_post(topic: str) -> dict:
     print(f"[TOPIC] {topic}")
     prompt = PROMPT.format(topic=topic)
-    for model_url in MODELS:
-        for attempt in range(3):
-            try:
-                content = call_hf(model_url, prompt)
-                content = content.strip()
-                for p in ["```html", "```"]:
-                    if content.startswith(p): content = content[len(p):]
-                if content.endswith("```"): content = content[:-3]
-                content = content.strip()
-                if len(content) < 100:
-                    raise Exception(f"Too short ({len(content)})")
-                print(f"[OK] Generated ({len(content)} chars)")
-                return {"title": topic, "content": content}
-            except Exception as e:
-                print(f"[WARN] {model_url.split('/')[-1]} attempt {attempt+1}: {e}")
-                time.sleep(15)
-    raise Exception("All models failed")
+    for attempt in range(5):
+        try:
+            content = call_gemini(prompt)
+            content = content.strip()
+            for p in ["```html", "```"]:
+                if content.startswith(p): content = content[len(p):]
+            if content.endswith("```"): content = content[:-3]
+            content = content.strip()
+            if len(content) < 100:
+                raise Exception(f"Too short ({len(content)})")
+            print(f"[OK] Generated ({len(content)} chars)")
+            return {"title": topic, "content": content}
+        except Exception as e:
+            print(f"[WARN] Attempt {attempt+1}: {e}")
+            if "429" in str(e) or "Quota" in str(e):
+                wait = min(120, 30 * (attempt + 1))
+                print(f"[WAIT] Sleeping {wait}s for quota...")
+                time.sleep(wait)
+            else:
+                time.sleep(10)
+    raise Exception("All attempts failed")
 
 if __name__ == "__main__":
     topic = random.choice(TOPICS)

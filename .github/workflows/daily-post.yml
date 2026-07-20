@@ -22,7 +22,7 @@ jobs:
       - name: Generate post
         run: python scripts/generate_post.py
         env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
       - name: Publish to Tistory
         run: python scripts/publish_tistory.py
