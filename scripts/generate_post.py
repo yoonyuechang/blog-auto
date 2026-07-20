@@ -26,15 +26,19 @@ MODELS = [
     "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3",
 ]
 
+print("[START] generate_post.py")
+
 def call_hf(url: str, prompt: str) -> str:
+    print(f"[HF] Calling {url.split('/')[-1]}...")
     resp = requests.post(url, headers=HF_HEADERS, json={
         "inputs": f"<s>[INST] {prompt} [/INST]",
         "parameters": {"max_new_tokens": 2048, "temperature": 0.7, "return_full_text": False}
-    }, timeout=180)
+    }, timeout=120)
     if resp.status_code == 503:
-        raise Exception("Model loading, retry")
+        raise Exception("Model loading")
     resp.raise_for_status()
-    return resp.json()[0]["generated_text"]
+    result = resp.json()
+    return result[0]["generated_text"] if isinstance(result, list) else result["choices"][0]["message"]["content"]
 
 PROMPT = """당신은 한국의 IT/재테크 블로거입니다. 아래 주제로 블로그 글을 써주세요.
 
@@ -52,6 +56,7 @@ PROMPT = """당신은 한국의 IT/재테크 블로거입니다. 아래 주제�
 - <body>나 <html> 태그는 포함하지 말고 내용만 출력"""
 
 def generate_post(topic: str) -> dict:
+    print(f"[TOPIC] {topic}")
     prompt = PROMPT.format(topic=topic)
     for model_url in MODELS:
         for attempt in range(3):
@@ -64,6 +69,7 @@ def generate_post(topic: str) -> dict:
                 content = content.strip()
                 if len(content) < 100:
                     raise Exception(f"Too short ({len(content)})")
+                print(f"[OK] Generated ({len(content)} chars)")
                 return {"title": topic, "content": content}
             except Exception as e:
                 print(f"[WARN] {model_url.split('/')[-1]} attempt {attempt+1}: {e}")
