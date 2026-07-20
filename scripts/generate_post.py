@@ -1,10 +1,4 @@
-import os
-import json
-import time
-from google import genai
-from google.genai import errors
-
-client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+import os, json, time, requests, random
 
 TOPICS = [
     "챗GPT로 월급 외 부수입 만드는 법 5가지",
@@ -17,12 +11,14 @@ TOPICS = [
     "핸드폰 요금제 50% 할인받는 꿀팁",
     "AI 챗봇으로 고객응대 자동화하는 방법",
     "무료로 나만의 홈페이지 만드는 법 (초보자용)",
+    "토스뱅크 vs 카카오뱅크 금리 비교 (2025)",
+    "네이버 스마트스토어 창업 준비 가이드",
+    "유튜브 쇼츠로 부수입 만드는 법",
+    "구글 스프레드시트로 가계부 만드는 법",
+    "무료 AI 툴 5개로 생산성 2배 올리기",
 ]
 
-MODELS = ["gemini-2.0-flash-lite", "gemini-1.5-flash"]
-
-def generate_post(topic: str) -> dict:
-    prompt = f"""당신은 한국의 IT/재테크 블로거입니다. 아래 주제로 블로그 글을 써주세요.
+PROMPT_TEMPLATE = """<s>[INST] 당신은 한국의 IT/재테크 블로거입니다. 아래 주제로 블로그 글을 써주세요.
 
 주제: {topic}
 
@@ -34,30 +30,35 @@ def generate_post(topic: str) -> dict:
 - 소제목(h2) 포함
 - 실제 도움되는 구체적인 팁 포함
 - 광고성 느낌 금지, 진짜 유용한 정보 위주
-- HTML 형식으로 출력 (h2, p, ul, li, strong 사용)
-- <body> 태그나 <html> 태그는 포함하지 말고 내용만 출력"""
+- HTML 형식으로 출력
+- <body>나 <html> 태그는 포함하지 말고 내용만 출력 [/INST]"""
 
-    for model in MODELS:
-        for attempt in range(3):
-            try:
-                resp = client.models.generate_content(model=model, contents=prompt)
-                content = resp.text.strip()
-                for prefix in ["```html", "```"]:
-                    if content.startswith(prefix):
-                        content = content[len(prefix):]
-                if content.endswith("```"):
-                    content = content[:-3]
-                content = content.strip()
-                return {"title": topic, "content": content}
-            except errors.ClientError as e:
-                if "RESOURCE_EXHAUSTED" in str(e):
-                    time.sleep(60)
-                    continue
-                raise
-    raise Exception("All models exhausted quota")
+HF_API = "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3"
+
+def generate_post(topic: str) -> dict:
+    prompt = PROMPT_TEMPLATE.format(topic=topic)
+    for attempt in range(5):
+        try:
+            resp = requests.post(HF_API, json={"inputs": prompt, "parameters": {"max_new_tokens": 2048, "temperature": 0.7}}, timeout=120)
+            if resp.status_code == 503:
+                time.sleep(30)
+                continue
+            resp.raise_for_status()
+            text = resp.json()[0]["generated_text"]
+            content = text.split("[/INST]")[-1].strip()
+            for p in ["```html", "```"]:
+                if content.startswith(p): content = content[len(p):]
+            if content.endswith("```"): content = content[:-3]
+            content = content.strip()
+            if len(content) < 100:
+                raise Exception("Too short")
+            return {"title": topic, "content": content}
+        except Exception as e:
+            print(f"[WARN] Attempt {attempt+1} failed: {e}")
+            time.sleep(10)
+    raise Exception("All attempts failed")
 
 if __name__ == "__main__":
-    import random
     topic = random.choice(TOPICS)
     post = generate_post(topic)
     os.makedirs("output", exist_ok=True)
