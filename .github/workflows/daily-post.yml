@@ -19,10 +19,10 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Generate post with Gemini
+      - name: Generate post
         run: python scripts/generate_post.py
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          NV_API_KEY: ${{ secrets.NV_API_KEY }}
 
       - name: Publish to Tistory
         run: python scripts/publish_tistory.py
