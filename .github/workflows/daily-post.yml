@@ -5,6 +5,9 @@ on:
     - cron: "0 0 * * *"
   workflow_dispatch:
 
+permissions:
+  models: read
+
 jobs:
   post:
     runs-on: ubuntu-latest
@@ -17,13 +20,12 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install requests
 
       - name: Generate post
         run: python scripts/generate_post.py
         env:
-          PYTHONUNBUFFERED: 1
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to Tistory
         run: python scripts/publish_tistory.py

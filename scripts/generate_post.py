@@ -18,15 +18,10 @@ TOPICS = [
     "무료 AI 툴 5개로 생산성 2배 올리기",
 ]
 
-GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODELS = [
-    "gemini-2.0-flash",
-    "gemini-2.0-flash-lite",
-    "gemini-1.5-flash",
-]
+GH_TOKEN = os.environ.get("GITHUB_TOKEN", "")
+GH_URL = "https://models.github.ai/inference/chat/completions"
 
-import sys
-print("[START] generate_post.py", flush=True)
+print("[START]", flush=True)
 
 PROMPT = """당신은 한국의 IT/재테크 블로거입니다. 아래 주제로 블로그 글을 써주세요.
 
@@ -43,45 +38,44 @@ PROMPT = """당신은 한국의 IT/재테크 블로거입니다. 아래 주제�
 - HTML 형식으로 출력
 - <body>나 <html> 태그는 포함하지 말고 내용만 출력"""
 
-def call_gemini(prompt: str, model: str) -> str:
-    print("[CALL] Sending request...", flush=True)
-    url = f"https://generativelanguage.googleapis.com/v1/models/{model}:generateContent"
-    resp = requests.post(
-        f"{url}?key={GEMINI_KEY}",
-        json={"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"maxOutputTokens": 4096, "temperature": 0.7}},
-        timeout=(10, 30)
-    )
-    print("[CALL] Got response", flush=True)
+def call_model(prompt: str) -> str:
+    headers = {
+        "Authorization": f"Bearer {GH_TOKEN}",
+        "Content-Type": "application/json",
+    }
+    data = {
+        "model": "openai/gpt-4o",
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 4096,
+        "temperature": 0.7,
+    }
+    print("[CALL] Sending...", flush=True)
+    resp = requests.post(GH_URL, headers=headers, json=data, timeout=(10, 60))
+    print(f"[CALL] Status: {resp.status_code}", flush=True)
     if resp.status_code == 429:
-        raise Exception("Quota exceeded")
+        raise Exception("Rate limited")
     resp.raise_for_status()
-    return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+    return resp.json()["choices"][0]["message"]["content"]
 
 def generate_post(topic: str) -> dict:
     print(f"[TOPIC] {topic}", flush=True)
     prompt = PROMPT.format(topic=topic)
-    for model in GEMINI_MODELS:
-        for attempt in range(3):
-            try:
-                content = call_gemini(prompt, model)
-                content = content.strip()
-                for p in ["```html", "```"]:
-                    if content.startswith(p): content = content[len(p):]
-                if content.endswith("```"): content = content[:-3]
-                content = content.strip()
-                if len(content) < 100:
-                    raise Exception(f"Too short ({len(content)})")
-                print(f"[OK] Generated ({len(content)} chars) using {model}", flush=True)
-                return {"title": topic, "content": content}
-            except Exception as e:
-                print(f"[WARN] {model} attempt {attempt+1}: {e}", flush=True)
-                if "429" in str(e) or "Quota" in str(e):
-                    wait = min(120, 30 * (attempt + 1))
-                    print(f"[WAIT] {wait}s...", flush=True)
-                    time.sleep(wait)
-                else:
-                    time.sleep(5)
-    raise Exception("All models failed")
+    for attempt in range(5):
+        try:
+            content = call_model(prompt)
+            content = content.strip()
+            for p in ["```html", "```"]:
+                if content.startswith(p): content = content[len(p):]
+            if content.endswith("```"): content = content[:-3]
+            content = content.strip()
+            if len(content) < 100:
+                raise Exception(f"Too short ({len(content)})")
+            print(f"[OK] Generated ({len(content)} chars)", flush=True)
+            return {"title": topic, "content": content}
+        except Exception as e:
+            print(f"[WARN] Attempt {attempt+1}: {e}", flush=True)
+            time.sleep(min(60, 10 * (attempt + 1)))
+    raise Exception("All attempts failed")
 
 if __name__ == "__main__":
     topic = random.choice(TOPICS)
@@ -89,4 +83,4 @@ if __name__ == "__main__":
     os.makedirs("output", exist_ok=True)
     with open("output/post.json", "w", encoding="utf-8") as f:
         json.dump(post, f, ensure_ascii=False, indent=2)
-    print(f"[OK] Generated: {post['title']}")
+    print(f"[OK] Generated: {post['title']}", flush=True)
