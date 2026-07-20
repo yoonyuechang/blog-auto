@@ -22,6 +22,7 @@ jobs:
       - name: Generate post
         run: python scripts/generate_post.py
         env:
+          PYTHONUNBUFFERED: 1
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
 
       - name: Publish to Tistory
