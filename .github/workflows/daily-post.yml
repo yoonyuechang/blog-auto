@@ -1,28 +1,31 @@
 name: Daily Blog Post
+
 on:
   schedule:
     - cron: "0 0 * * *"
-  workflow_dispatch: {}
-permissions:
-  contents: write
+  workflow_dispatch:
+
 jobs:
-  generate:
+  post:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: pip install requests
-      - name: Generate post
-        env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate post with Gemini
         run: python scripts/generate_post.py
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: daily blog post [skip ci]"
-          commit_user_name: "blog-bot"
-          commit_user_email: "blog-bot@users.noreply.github.com"
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+      - name: Publish to Tistory
+        run: python scripts/publish_tistory.py
+        env:
+          TISTORY_BLOG: ${{ secrets.TISTORY_BLOG }}
+          TISTORY_COOKIE: ${{ secrets.TISTORY_COOKIE }}

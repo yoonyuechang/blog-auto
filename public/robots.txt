@@ -1,9 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /api/
-
-User-agent: Baiduspider
-Crawl-delay: 10
-
-Sitemap: https://blog-auto-woad.vercel.app/sitemap.xml

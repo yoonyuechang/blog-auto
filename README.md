@@ -1,25 +1,28 @@
-# Dev & AI Digest
+# smartmoneyteam 블로그 자동화
 
-매일 자동으로 작성/발행되는 기술 블로그입니다.
+매일 AI가 IT/재테크 글을 생성해서 티스토리에 자동 발행합니다.
 
-## 구조
+## 셋업 방법 (10분)
 
-- HackerNews 인기 글을 요약/분석 (2일에 1회)
-- Git 실전 팁 소개 (3일에 1회)
-- SVG 히어로 이미지 자동 생성
-- GitHub Pages로 자동 배포
+### 1. GitHub 업로드
+- 이 폴더의 모든 파일을 `https://github.com/yoonyuechang/blog-auto` 에 업로드 (기존 파일 다 지우고)
 
-## 셋업 (3분)
+### 2. GitHub Secrets 등록 (Settings → Secrets and variables → Actions → New repository secret)
 
-1. 이 저장소를 GitHub에 생성 (public)
-2. Google AI Studio에서 Gemini API 키 발급 (무료): https://aistudio.google.com/apikey
-3. GitHub 저장소 → Settings → Secrets and variables → Actions → `GEMINI_API_KEY` 추가
-4. GitHub 저장소 → Settings → Pages → Source: **GitHub Actions**
-5. Actions 탭 → Daily Blog Post → **Run workflow** (첫 수동 실행)
-6. 이후 매일 09:00 KST에 자동 실행됨
+| Secret | 값 |
+|--------|-----|
+| `GEMINI_API_KEY` | 위에서 받은 키 |
+| `TISTORY_BLOG` | `smartmoneyteam` |
+| `TISTORY_COOKIE` | 아래 참고 |
 
-## 커스터마이징
+### 3. TISTORY_COOKIE 얻는 법
+1. 크롬/엣지로 `smartmoneyteam.tistory.com/manage` 에 로그인
+2. F12 (개발자도구) → Network 탭
+3. 페이지 새로고침
+4. 요청 목록 중 아무거나 클릭 → Request Headers 에서 `Cookie:` 값 복사 (전부)
+5. 그 값을 TISTORY_COOKIE secret에 저장
 
-- `scripts/topics.txt` 대신 `scripts/generate_post.py` 안의 `GIT_TOPICS` 수정
-- `_config.yml`에서 블로그 이름/설명 변경
-- `style.css`에서 디자인 변경
+### 4. 첫 실행
+- GitHub → Actions → Daily Blog Post → Run workflow
+
+이후 매일 09:00 KST에 자동 실행됩니다.
