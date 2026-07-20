@@ -1,0 +1,131 @@
+/* smartmoneyteam 블로그 커스텀 CSS */
+
+/* 전체 폰트 */
+body, #content, .entry-content {
+    font-family: 'Noto Sans KR', -apple-system, 'Malgun Gothic', sans-serif;
+    line-height: 1.8;
+    color: #2d2d2d;
+}
+
+/* 블로그 제목 */
+#header h1 a {
+    font-weight: 800;
+    font-size: 28px;
+    letter-spacing: -1px;
+    color: #1a73e8;
+}
+
+/* 글 제목 */
+.entry-title, .entry-title a {
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1.4;
+    color: #1a1a1a;
+}
+
+/* 본문 스타일 */
+.entry-content p {
+    margin-bottom: 16px;
+    font-size: 15px;
+    line-height: 1.9;
+}
+
+.entry-content h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 40px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #1a73e8;
+    color: #1a1a1a;
+}
+
+.entry-content h3 {
+    font-size: 17px;
+    font-weight: 600;
+    margin-top: 28px;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.entry-content ul, .entry-content ol {
+    margin-bottom: 16px;
+    padding-left: 20px;
+}
+
+.entry-content li {
+    margin-bottom: 6px;
+    font-size: 15px;
+}
+
+.entry-content strong {
+    color: #1a73e8;
+}
+
+/* 인용구 */
+.entry-content blockquote {
+    border-left: 4px solid #1a73e8;
+    padding: 12px 20px;
+    margin: 20px 0;
+    background: #f8f9fa;
+    border-radius: 4px;
+    color: #555;
+}
+
+/* 이미지 */
+.entry-content img {
+    border-radius: 8px;
+    max-width: 100%;
+    height: auto;
+}
+
+/* 목차 느낌의 박스 */
+.entry-content .table-of-contents {
+    background: #f0f4ff;
+    border: 1px solid #d0d8e8;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 20px 0;
+}
+
+/* 사이드바 */
+#sidebar h2 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a73e8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+/* 버튼 느낌 */
+.entry-content a {
+    color: #1a73e8;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.entry-content a:hover {
+    color: #0d47a1;
+}
+
+/* 날짜 */
+.entry-date {
+    font-size: 13px;
+    color: #888;
+}
+
+/* 태그 */
+.entry-tags a {
+    font-size: 12px;
+    color: #666;
+    background: #f0f0f0;
+    padding: 3px 8px;
+    border-radius: 12px;
+    margin-right: 4px;
+}
+
+.entry-tags a:hover {
+    background: #1a73e8;
+    color: white;
+}
