@@ -19,7 +19,11 @@ TOPICS = [
 ]
 
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-lite:generateContent"
+GEMINI_MODELS = [
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-lite",
+    "gemini-1.5-flash",
+]
 
 import sys
 print("[START] generate_post.py", flush=True)
@@ -39,10 +43,11 @@ PROMPT = """당신은 한국의 IT/재테크 블로거입니다. 아래 주제�
 - HTML 형식으로 출력
 - <body>나 <html> 태그는 포함하지 말고 내용만 출력"""
 
-def call_gemini(prompt: str) -> str:
+def call_gemini(prompt: str, model: str) -> str:
     print("[CALL] Sending request...", flush=True)
+    url = f"https://generativelanguage.googleapis.com/v1/models/{model}:generateContent"
     resp = requests.post(
-        f"{GEMINI_URL}?key={GEMINI_KEY}",
+        f"{url}?key={GEMINI_KEY}",
         json={"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"maxOutputTokens": 4096, "temperature": 0.7}},
         timeout=(10, 30)
     )
@@ -55,27 +60,28 @@ def call_gemini(prompt: str) -> str:
 def generate_post(topic: str) -> dict:
     print(f"[TOPIC] {topic}", flush=True)
     prompt = PROMPT.format(topic=topic)
-    for attempt in range(5):
-        try:
-            content = call_gemini(prompt)
-            content = content.strip()
-            for p in ["```html", "```"]:
-                if content.startswith(p): content = content[len(p):]
-            if content.endswith("```"): content = content[:-3]
-            content = content.strip()
-            if len(content) < 100:
-                raise Exception(f"Too short ({len(content)})")
-            print(f"[OK] Generated ({len(content)} chars)", flush=True)
-            return {"title": topic, "content": content}
-        except Exception as e:
-            print(f"[WARN] Attempt {attempt+1}: {e}", flush=True)
-            if "429" in str(e) or "Quota" in str(e):
-                wait = min(120, 30 * (attempt + 1))
-                print(f"[WAIT] Sleeping {wait}s...", flush=True)
-                time.sleep(wait)
-            else:
-                time.sleep(10)
-    raise Exception("All attempts failed")
+    for model in GEMINI_MODELS:
+        for attempt in range(3):
+            try:
+                content = call_gemini(prompt, model)
+                content = content.strip()
+                for p in ["```html", "```"]:
+                    if content.startswith(p): content = content[len(p):]
+                if content.endswith("```"): content = content[:-3]
+                content = content.strip()
+                if len(content) < 100:
+                    raise Exception(f"Too short ({len(content)})")
+                print(f"[OK] Generated ({len(content)} chars) using {model}", flush=True)
+                return {"title": topic, "content": content}
+            except Exception as e:
+                print(f"[WARN] {model} attempt {attempt+1}: {e}", flush=True)
+                if "429" in str(e) or "Quota" in str(e):
+                    wait = min(120, 30 * (attempt + 1))
+                    print(f"[WAIT] {wait}s...", flush=True)
+                    time.sleep(wait)
+                else:
+                    time.sleep(5)
+    raise Exception("All models failed")
 
 if __name__ == "__main__":
     topic = random.choice(TOPICS)
