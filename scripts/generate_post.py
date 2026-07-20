@@ -18,13 +18,16 @@ TOPICS = [
     "무료 AI 툴 5개로 생산성 2배 올리기",
 ]
 
+HF_TOKEN = os.environ.get("HF_TOKEN", "")
+HF_HEADERS = {"Authorization": f"Bearer {HF_TOKEN}"} if HF_TOKEN else {}
+
 MODELS = [
     "https://api-inference.huggingface.co/models/Qwen/Qwen2.5-7B-Instruct",
     "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.3",
 ]
 
 def call_hf(url: str, prompt: str) -> str:
-    resp = requests.post(url, json={
+    resp = requests.post(url, headers=HF_HEADERS, json={
         "inputs": f"<s>[INST] {prompt} [/INST]",
         "parameters": {"max_new_tokens": 2048, "temperature": 0.7, "return_full_text": False}
     }, timeout=180)

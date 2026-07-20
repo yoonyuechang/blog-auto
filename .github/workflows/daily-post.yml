@@ -21,6 +21,8 @@ jobs:
 
       - name: Generate post
         run: python scripts/generate_post.py
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
 
       - name: Publish to Tistory
         run: python scripts/publish_tistory.py
