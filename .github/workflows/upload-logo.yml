@@ -1,0 +1,33 @@
+name: Upload Logo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Playwright
+        run: |
+          pip install playwright
+          playwright install chromium
+
+      - name: Upload logo to Tistory
+        run: python scripts/upload_logo.py
+        env:
+          KAKAO_EMAIL: ${{ secrets.KAKAO_EMAIL }}
+          KAKAO_PASSWORD: ${{ secrets.KAKAO_PASSWORD }}
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: output/
