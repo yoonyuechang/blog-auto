@@ -1,6 +1,8 @@
 import os
 import json
+import time
 from google import genai
+from google.genai import errors
 
 client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
@@ -16,6 +18,8 @@ TOPICS = [
     "AI 챗봇으로 고객응대 자동화하는 방법",
     "무료로 나만의 홈페이지 만드는 법 (초보자용)",
 ]
+
+MODELS = ["gemini-2.0-flash-lite", "gemini-1.5-flash"]
 
 def generate_post(topic: str) -> dict:
     prompt = f"""당신은 한국의 IT/재테크 블로거입니다. 아래 주제로 블로그 글을 써주세요.
@@ -33,15 +37,24 @@ def generate_post(topic: str) -> dict:
 - HTML 형식으로 출력 (h2, p, ul, li, strong 사용)
 - <body> 태그나 <html> 태그는 포함하지 말고 내용만 출력"""
 
-    resp = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt,
-    )
-    content = resp.text.strip()
-    content = content.removeprefix("```html").removeprefix("```").removesuffix("```").strip()
-
-    title = topic
-    return {"title": title, "content": content}
+    for model in MODELS:
+        for attempt in range(3):
+            try:
+                resp = client.models.generate_content(model=model, contents=prompt)
+                content = resp.text.strip()
+                for prefix in ["```html", "```"]:
+                    if content.startswith(prefix):
+                        content = content[len(prefix):]
+                if content.endswith("```"):
+                    content = content[:-3]
+                content = content.strip()
+                return {"title": topic, "content": content}
+            except errors.ClientError as e:
+                if "RESOURCE_EXHAUSTED" in str(e):
+                    time.sleep(60)
+                    continue
+                raise
+    raise Exception("All models exhausted quota")
 
 if __name__ == "__main__":
     import random
