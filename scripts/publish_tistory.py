@@ -33,13 +33,17 @@ def publish():
     }
 
     resp = requests.post(url, headers=headers, json=data, timeout=30)
-    result = resp.json()
-
-    if result.get("status") == "true" or resp.status_code == 200:
-        post_id = result.get("postId", "?")
-        print(f"[OK] Published: {post['title']} (id: {post_id})")
-    else:
-        print(f"[FAIL] {resp.status_code} {resp.text[:500]}")
+    print(f"[DEBUG] Status: {resp.status_code}")
+    print(f"[DEBUG] Response: {resp.text[:300]}")
+    try:
+        result = resp.json()
+        if result.get("status") == "true" or resp.status_code == 200:
+            post_id = result.get("postId", "?")
+            print(f"[OK] Published: {post['title']} (id: {post_id})")
+        else:
+            print(f"[FAIL] API error: {result}")
+    except:
+        print(f"[FAIL] Not JSON - cookie probably expired. Renew it.")
 
 if __name__ == "__main__":
     publish()
